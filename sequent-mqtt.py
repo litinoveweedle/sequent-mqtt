@@ -551,15 +551,49 @@ def watchdog_megaind(stack: int, mode: int) -> bool:
         return False
     if mode == 1:
         if megaind.wdtGetPeriod(stack) != int(config["WATCHDOG"]["TIMEOUT"]):
-            megaind.wdtSetPeriod(stack, int(config["WATCHDOG"]["TIMEOUT"]))
+            try:
+                megaind.wdtSetPeriod(stack, int(config["WATCHDOG"]["TIMEOUT"]))
+            except:
+                raise AppError(
+                    "Can't set watchdog period for megaind stack: "
+                    + str(stack)
+                    + " to value: "
+                    + config["WATCHDOG"]["TIMEOUT"]
+                )
         if megaind.wdtGetDefaultPeriod(stack) != int(config["WATCHDOG"]["BOOT"]):
-            megaind.wdtSetDefaultPeriod(stack, int(config["WATCHDOG"]["BOOT"]))
+            try:
+                megaind.wdtSetDefaultPeriod(stack, int(config["WATCHDOG"]["BOOT"]))
+            except:
+                raise AppError(
+                    "Can't set watchdog default period for megaind stack: "
+                    + str(stack)
+                    + " to value: "
+                    + config["WATCHDOG"]["BOOT"]
+                )
         if megaind.wdtGetOffInterval(stack) != int(config["WATCHDOG"]["RESET"]):
-            megaind.wdtSetOffInterval(stack, int(config["WATCHDOG"]["RESET"]))
+            try:
+                megaind.wdtSetOffInterval(stack, int(config["WATCHDOG"]["RESET"]))
+            except:
+                raise AppError(
+                    "Can't set watchdog off interval for megaind stack: "
+                    + str(stack)
+                    + " to value: "
+                    + config["WATCHDOG"]["RESET"]
+                )
     elif mode == 2:
-        megaind.wdtSetPeriod(stack, 65000)
+        try:
+            megaind.wdtSetPeriod(stack, 65000)
+        except:
+            raise AppError(
+                "Can't set watchdog period for megaind stack: "
+                + str(stack)
+                + " to value: 65000"
+            )
     else:
-        megaind.wdtReload(stack)
+        try:
+            megaind.wdtReload(stack)
+        except:
+            raise AppError("Can't reload watchdog for megaind stack: " + str(stack))
     return True
 
 
@@ -861,15 +895,51 @@ def watchdog_megabas(stack: int, mode: int) -> bool:
         return False
     if mode == 1:
         if megabas.wdtGetPeriod(stack) != int(config["WATCHDOG"]["TIMEOUT"]):
-            megabas.wdtSetPeriod(stack, int(config["WATCHDOG"]["TIMEOUT"]))
+            try:
+                megabas.wdtSetPeriod(stack, int(config["WATCHDOG"]["TIMEOUT"]))
+            except:
+                raise AppError(
+                    "Can't set megabas stack: "
+                    + str(stack)
+                    + ", watchdog period to value: "
+                    + str(config["WATCHDOG"]["TIMEOUT"])
+                )
         if megabas.wdtGetDefaultPeriod(stack) != int(config["WATCHDOG"]["BOOT"]):
-            megabas.wdtSetDefaultPeriod(stack, int(config["WATCHDOG"]["BOOT"]))
+            try:
+                megabas.wdtSetDefaultPeriod(stack, int(config["WATCHDOG"]["BOOT"]))
+            except:
+                raise AppError(
+                    "Can't set megabas stack: "
+                    + str(stack)
+                    + ", watchdog default period to value: "
+                    + str(config["WATCHDOG"]["BOOT"])
+                )
         if megabas.wdtGetOffInterval(stack) != int(config["WATCHDOG"]["RESET"]):
-            megabas.wdtSetOffInterval(stack, int(config["WATCHDOG"]["RESET"]))
+            try:
+                megabas.wdtSetOffInterval(stack, int(config["WATCHDOG"]["RESET"]))
+            except:
+                raise AppError(
+                    "Can't set megabas stack: "
+                    + str(stack)
+                    + ", watchdog off interval to value: "
+                    + str(config["WATCHDOG"]["RESET"])
+                )
     elif mode == 2:
-        megabas.wdtSetPeriod(stack, 65000)
+        try:
+            megabas.wdtSetPeriod(stack, 65000)
+        except:
+            raise AppError(
+                "Can't set megabas stack: "
+                + str(stack)
+                + ", watchdog period to value: 65000"
+            )
     else:
-        megabas.wdtReload(stack)
+        try:
+            megabas.wdtReload(stack)
+        except:
+            raise AppError(
+                "Can't set megabas stack: " + str(stack) + ", watchdog reload"
+            )
     return True
 
 
