@@ -49,8 +49,8 @@ defaults = {
             "4_20": [0, 0, 0, 0],
             "pwm": [0, 0, 0, 0],
             "led": [0, 0, 0, 0],
-            "opto_rce": [0, 0, 0, 0],
-            "opto_fce": [0, 0, 0, 0],
+            "opto_edge": [0, 0, 0, 0],
+            "opto_rst": [0, 0, 0, 0],
         },
         "input": {
             "0_10": [0, 0, 0, 0],
@@ -64,23 +64,23 @@ defaults = {
         "response": {
             "0_10": [0, 0, 0, 0],
             "triac": [0, 0, 0, 0],
-            "cont_rce": [0, 0, 0, 0, 0, 0, 0, 0],
-            "cont_fce": [0, 0, 0, 0, 0, 0, 0, 0],
+            "cont_edge": [0, 0, 0, 0, 0, 0, 0, 0],
+            "cont_rst": [0, 0, 0, 0, 0, 0, 0, 0],
         },
         "input": {
             "0_10": [0, 0, 0, 0, 0, 0, 0, 0],
             "1k": [0, 0, 0, 0, 0, 0, 0, 0],
             "10k": [0, 0, 0, 0, 0, 0, 0, 0],
             "cont": [0, 0, 0, 0, 0, 0, 0, 0],
-            "cont_count": [0, 0, 0, 0, 0, 0, 0, 00],
+            "cont_count": [0, 0, 0, 0, 0, 0, 0, 0],
         },
     },
     "8relind": {"response": {"relay": [0, 0, 0, 0, 0, 0, 0, 0]}},
     "8inputs": {"input": {"opto": [0, 0, 0, 0, 0, 0, 0, 0]}},
     "16inpind": {
         "response": {
-            "opto_rce": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            "opto_fce": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "opto_edge": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "opto_rst": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         },
         "input": {
             "opto": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -247,30 +247,30 @@ def get_megaind(stack: int, init: int) -> None:
             cache[stack]["response"]["led"][channel - 1] = value
 
         value = megaind.getOptoRisingCountEnable(stack, channel)
-        if init or value != cache[stack]["response"]["opto_rce"][channel - 1]:
+        if init or value != cache[stack]["response"]["opto_edge"][channel - 1]:
             client.publish(
                 config["MQTT"]["TOPIC"]
                 + "/megaind/"
                 + str(stack)
-                + "/response/opto_rce/"
+                + "/response/opto_edge/"
                 + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
-            cache[stack]["response"]["opto_rce"][channel - 1] = value
+            cache[stack]["response"]["opto_edge"][channel - 1] = value
 
-        value = megaind.getOptoFallingCountEnable(stack, channel)
-        if init or value != cache[stack]["response"]["opto_fce"][channel - 1]:
+        value = 0
+        if init or value != cache[stack]["response"]["opto_rst"][channel - 1]:
             client.publish(
                 config["MQTT"]["TOPIC"]
                 + "/megaind/"
                 + str(stack)
-                + "/response/opto_fce/"
+                + "/response/opto_rst/"
                 + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
-            cache[stack]["response"]["opto_fce"][channel - 1] = value
+            cache[stack]["response"]["opto_rst"][channel - 1] = value
 
         value = round(megaind.get0_10In(stack, channel), 2)
         if init or value != cache[stack]["input"]["0_10"][channel - 1]:
@@ -435,15 +435,20 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
             )
         else:
             cache[stack]["response"]["led"][channel - 1] = value
-    elif output == "opto_rce" and 1 <= channel <= 4 and value in [0, 1]:
+    elif output == "opto_edge" and 1 <= channel <= 4 and value in [0, 1, 2, 3]:
         try:
-            megaind.setOptoRisingCountEnable(stack, channel, value)
-            value = megaind.getOptoRisingCountEnable(stack, channel)
+            rce = (value >> 0) & 1
+            fce = (value >> 1) & 1
+            megaind.setOptoRisingCountEnable(stack, channel, rce)
+            megaind.setOptoFallingCountEnable(stack, channel, fce)
+            rce = megaind.getOptoRisingCountEnable(stack, channel)
+            fce = megaind.getOptoFallingCountEnable(stack, channel)
+            value = (rce << 0) | (fce << 1)
             client.publish(
                 config["MQTT"]["TOPIC"]
                 + "/megaind/"
                 + str(stack)
-                + "/response/opto_rce/"
+                + "/response/opto_edge/"
                 + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
@@ -452,64 +457,50 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
             raise AppError(
                 "Can't set megaind stack: "
                 + str(stack)
-                + ", response: opto_rce, channel: "
+                + ", response: opto_edge, channel: "
                 + str(channel)
                 + " to value: "
                 + str(value)
             )
         else:
-            cache[stack]["response"]["opto_rce"][channel - 1] = value
-    elif output == "opto_fce" and 1 <= channel <= 4 and value in [0, 1]:
+            cache[stack]["response"]["opto_edge"][channel - 1] = value
+    elif output == "opto_rst" and 1 <= channel <= 4 and value in [0, 1]:
         try:
-            megaind.setOptoFallingCountEnable(stack, channel, value)
-            value = megaind.getOptoFallingCountEnable(stack, channel)
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megaind/"
-                + str(stack)
-                + "/response/opto_fce/"
-                + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
-            )
-        except:
-            raise AppError(
-                "Can't set megaind stack: "
-                + str(stack)
-                + ", response: opto_fce, channel: "
-                + str(channel)
-                + " to value: "
-                + str(value)
-            )
-        else:
-            cache[stack]["response"]["opto_fce"][channel - 1] = value
-    elif output == "opto_rst" and 1 <= channel <= 4 and value == 1:
-        try:
-            megaind.rstOptoCount(stack, channel)
-            value = megaind.getOptoCount(stack, channel)
+            if value == 1:
+                megaind.rstOptoCount(stack, channel)
+                value = megaind.getOptoCount(stack, channel)
+                client.publish(
+                    config["MQTT"]["TOPIC"]
+                    + "/megaind/"
+                    + str(stack)
+                    + "/response/opto_rst/"
+                    + str(channel),
+                    1,
+                    int(config["MQTT"]["QOS"]),
+                )
+                client.publish(
+                    config["MQTT"]["TOPIC"]
+                    + "/megaind/"
+                    + str(stack)
+                    + "/input/opto_count/"
+                    + str(channel),
+                    str(value),
+                    int(config["MQTT"]["QOS"]),
+                )
             client.publish(
                 config["MQTT"]["TOPIC"]
                 + "/megaind/"
                 + str(stack)
                 + "/response/opto_rst/"
                 + str(channel),
-                1,
-                int(config["MQTT"]["QOS"]),
-            )
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megaind/"
-                + str(stack)
-                + "/input/opto_count/"
-                + str(channel),
-                str(value),
+                0,
                 int(config["MQTT"]["QOS"]),
             )
         except:
             raise AppError(
                 "Can't set megaind stack: "
                 + str(stack)
-                + ", output: opto_rst, channel: "
+                + ", response: opto_rst, channel: "
                 + str(channel)
                 + " to value: 1"
             )
@@ -696,40 +687,17 @@ def get_megabas(stack: int, init: int) -> None:
             cache[stack]["input"]["cont_count"][channel - 1] = value
 
         value = megabas.getContactCountEdge(stack, channel)
-        if value == 1:
-            raising = 1
-            falling = 0
-        elif value == 2:
-            raising = 0
-            falling = 1
-        elif value == 3:
-            raising = 1
-            falling = 1
-        else:
-            raising = 0
-            falling = 0
-        if init or raising != cache[stack]["response"]["cont_rce"][channel - 1]:
+        if init or value != cache[stack]["response"]["cont_edge"][channel - 1]:
             client.publish(
                 config["MQTT"]["TOPIC"]
                 + "/megabas/"
                 + str(stack)
-                + "/response/cont_rce/"
+                + "/response/cont_edge/"
                 + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
-            cache[stack]["response"]["cont_rce"][channel - 1] = raising
-        if init or falling != cache[stack]["response"]["cont_fce"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megabas/"
-                + str(stack)
-                + "/response/cont_fce/"
-                + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
-            )
-            cache[stack]["response"]["cont_fce"][channel - 1] = falling
+            cache[stack]["response"]["cont_edge"][channel - 1] = value
 
     megabas.getTriacs(stack)
 
@@ -787,27 +755,15 @@ def set_megabas(stack: int, output: str, channel: int, value: int) -> None:
             )
         else:
             cache[stack]["response"]["triac"][channel - 1] = value
-    elif output == "cont_rce" and 1 <= channel <= 8 and value in [0, 1]:
-        if value == 0 and cache[stack]["response"]["cont_fce"][channel - 1] == 1:
-            value = 2
-        elif value == 1 and cache[stack]["response"]["cont_fce"][channel - 1] == 0:
-            value = 1
-        elif value == 1 and cache[stack]["response"]["cont_fce"][channel - 1] == 1:
-            value = 3
-        else:
-            value = 0
+    elif output == "cont_edge" and 1 <= channel <= 8 and value in [0, 1, 2, 3]:
         try:
             megabas.setContactCountEdge(stack, channel, value)
             value = megabas.getContactCountEdge(stack, channel)
-            if value == 1 or value == 3:
-                value = 1
-            else:
-                value = 0
             client.publish(
                 config["MQTT"]["TOPIC"]
                 + "/megabas/"
                 + str(stack)
-                + "/input/cont_rce/"
+                + "/response/cont_edge/"
                 + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
@@ -816,54 +772,18 @@ def set_megabas(stack: int, output: str, channel: int, value: int) -> None:
             raise AppError(
                 "Can't set megabas stack: "
                 + str(stack)
-                + ", input: cont_rce, channel: "
+                + ", response: cont_edge, channel: "
                 + str(channel)
                 + " to value: "
                 + str(value)
             )
         else:
-            cache[stack]["response"]["cont_rce"][channel - 1] = value
-    elif output == "cont_fce" and 1 <= channel <= 8 and value in [0, 1]:
-        if value == 0 and cache[stack]["response"]["cont_rce"][channel - 1] == 1:
-            value = 1
-        elif value == 1 and cache[stack]["response"]["cont_rce"][channel - 1] == 0:
-            value = 2
-        elif value == 1 and cache[stack]["response"]["cont_rce"][channel - 1] == 1:
-            value = 3
-        else:
-            value = 0
-        try:
-            megabas.setContactCountEdge(stack, channel, value)
-            value = megabas.getContactCountEdge(stack, channel)
-            if value == 2 or value == 3:
-                value = 1
-            else:
-                value = 0
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megabas/"
-                + str(stack)
-                + "/input/cont_fce/"
-                + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
-            )
-        except:
-            raise AppError(
-                "Can't set megabas stack: "
-                + str(stack)
-                + ", input: cont_fce, channel: "
-                + str(channel)
-                + " to value: "
-                + str(value)
-            )
-        else:
-            cache[stack]["response"]["cont_fce"][channel - 1] = value
+            cache[stack]["response"]["cont_edge"][channel - 1] = value
     else:
         raise AppError(
             "Can't set megabas stack: "
             + str(stack)
-            + ", topic: "
+            + ", response: "
             + output
             + ", channel: "
             + str(channel)
@@ -1004,6 +924,34 @@ def reset_8relind(stack: int) -> None:
 
 def get_16inpind(stack: int, init: int) -> None:
     for channel in range(1, 17):
+        fce = lib16inpind.getOptoEdge(stack, channel, 0)
+        rce = lib16inpind.getOptoEdge(stack, channel, 1)
+        value = (rce << 0) | (fce << 1)
+        if init or value != cache[stack]["response"]["opto_edge"][channel - 1]:
+            client.publish(
+                config["MQTT"]["TOPIC"]
+                + "/16inpind/"
+                + str(stack)
+                + "/response/opto_edge/"
+                + str(channel),
+                str(value),
+                int(config["MQTT"]["QOS"]),
+            )
+            cache[stack]["response"]["opto_edge"][channel - 1] = value
+
+        value = 0
+        if init or value != cache[stack]["response"]["opto_rst"][channel - 1]:
+            client.publish(
+                config["MQTT"]["TOPIC"]
+                + "/16inpind/"
+                + str(stack)
+                + "/response/opto_rst/"
+                + str(channel),
+                str(value),
+                int(config["MQTT"]["QOS"]),
+            )
+            cache[stack]["response"]["opto_rst"][channel - 1] = value
+
         value = lib16inpind.getOpto(stack, channel)
         if init or value != cache[stack]["input"]["opto"][channel - 1]:
             client.publish(
@@ -1030,43 +978,23 @@ def get_16inpind(stack: int, init: int) -> None:
             )
             cache[stack]["input"]["opto_count"][channel - 1] = value
 
-        value = lib16inpind.getOptoEdge(stack, channel, 1)
-        if init or value != cache[stack]["response"]["opto_rce"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/16inpind/"
-                + str(stack)
-                + "/response/opto_rce/"
-                + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
-            )
-            cache[stack]["response"]["opto_rce"][channel - 1] = value
-
-        value = lib16inpind.getOptoEdge(stack, channel, 0)
-        if init or value != cache[stack]["response"]["opto_fce"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/16inpind/"
-                + str(stack)
-                + "/response/opto_fce/"
-                + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
-            )
-            cache[stack]["response"]["opto_fce"][channel - 1] = value
-
 
 def set_16inpind(stack: int, output: str, channel: int, value: int) -> None:
-    if output == "opto_rce" and 1 <= channel <= 16 and value in [0, 1]:
+    if output == "opto_edge" and 1 <= channel <= 16 and value in [0, 1, 2, 3]:
         try:
-            lib16inpind.setOptoEdge(stack, channel, 1, value)
-            value = lib16inpind.getOptoEdge(stack, channel, 1)
+            rce = (value >> 0) & 1
+            fce = (value >> 1) & 1
+            # Edge type (0=falling, 1=rising)
+            lib16inpind.setOptoEdge(stack, channel, 0, fce)
+            lib16inpind.setOptoEdge(stack, channel, 1, rce)
+            fce = lib16inpind.getOptoEdge(stack, channel, 0)
+            rce = lib16inpind.getOptoEdge(stack, channel, 1)
+            value = (rce << 0) | (fce << 1)
             client.publish(
                 config["MQTT"]["TOPIC"]
                 + "/16inpind/"
                 + str(stack)
-                + "/response/opto_rce/"
+                + "/response/opto_edge/"
                 + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
@@ -1075,22 +1003,41 @@ def set_16inpind(stack: int, output: str, channel: int, value: int) -> None:
             raise AppError(
                 "Can't set 16inpind stack: "
                 + str(stack)
-                + ", input: opto_rce, channel: "
+                + ", response: opto_edge, channel: "
                 + str(channel)
                 + " to value: "
                 + str(value)
             )
         else:
-            cache[stack]["response"]["opto_rce"][channel - 1] = value
-    elif output == "opto_fce" and 1 <= channel <= 16 and value in [0, 1]:
+            cache[stack]["response"]["opto_edge"][channel - 1] = value
+    elif output == "opto_rst" and 1 <= channel <= 16 and value in [0, 1]:
         try:
-            lib16inpind.setOptoEdge(stack, channel, 0, value)
-            value = lib16inpind.getOptoEdge(stack, channel, 0)
+            if value == 1:
+                lib16inpind.resetOptoCount(stack, channel, 0, value)
+                value = lib16inpind.getOptoCount(stack, channel, 0)
+                client.publish(
+                    config["MQTT"]["TOPIC"]
+                    + "/16inpind/"
+                    + str(stack)
+                    + "/response/opto_rst/"
+                    + str(channel),
+                    1,
+                    int(config["MQTT"]["QOS"]),
+                )
+                client.publish(
+                    config["MQTT"]["TOPIC"]
+                    + "/16inpind/"
+                    + str(stack)
+                    + "/input/opto_count/"
+                    + str(channel),
+                    str(value),
+                    int(config["MQTT"]["QOS"]),
+                )
             client.publish(
                 config["MQTT"]["TOPIC"]
                 + "/16inpind/"
                 + str(stack)
-                + "/response/opto_fce/"
+                + "/response/opto_rst/"
                 + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
@@ -1099,13 +1046,12 @@ def set_16inpind(stack: int, output: str, channel: int, value: int) -> None:
             raise AppError(
                 "Can't set 16inpind stack: "
                 + str(stack)
-                + ", input: opto_fce, channel: "
+                + ", response: opto_rst, channel: "
                 + str(channel)
-                + " to value: "
-                + str(value)
+                + " to value: 1"
             )
         else:
-            cache[stack]["response"]["opto_fce"][channel - 1] = value
+            cache[stack]["response"]["opto_rst"][channel - 1] = value
     else:
         raise AppError(
             "Can't set 16inpind stack: "
@@ -1157,7 +1103,11 @@ def cards_init() -> None:
     )
     cards_tele(1)
     for stack in cards.keys():
-        if cards[stack] == "megaind":
+        # Subscribe for any card commands
+        if "response" in cache[stack]:
+            logging.debug(
+                f"Subscribing for output commands for stack {stack} of type {cards[stack]}"
+            )
             client.subscribe(
                 config["MQTT"]["TOPIC"]
                 + "/"
@@ -1167,28 +1117,12 @@ def cards_init() -> None:
                 + "/output/#",
                 int(config["MQTT"]["QOS"]),
             )
+
+        if cards[stack] == "megaind":
             get_megaind(stack, 1)
         elif cards[stack] == "megabas":
-            client.subscribe(
-                config["MQTT"]["TOPIC"]
-                + "/"
-                + cards[stack]
-                + "/"
-                + str(stack)
-                + "/output/#",
-                int(config["MQTT"]["QOS"]),
-            )
             get_megabas(stack, 1)
         elif cards[stack] == "8relind":
-            client.subscribe(
-                config["MQTT"]["TOPIC"]
-                + "/"
-                + cards[stack]
-                + "/"
-                + str(stack)
-                + "/output/#",
-                int(config["MQTT"]["QOS"]),
-            )
             get_8relind(stack, 1)
         elif cards[stack] == "8inputs":
             get_8inputs(stack, 1)
@@ -1429,23 +1363,23 @@ def mqtt_on_message(client: mqtt.Client, userdata: Any, msg: mqtt.MQTTMessage) -
     megaind = re.match(
         r"^"
         + config["MQTT"]["TOPIC"]
-        + "\/megaind\/([0-7])\/output\/(0_10|4_20|pwm|led|opto_rce|opto_fce|opto_rst)\/([1-8])$",
+        + "\/megaind\/([0-7])\/output\/(0_10|4_20|pwm|led|opto_edge|opto_rst)\/(\d+)$",
         str(msg.topic),
     )
     megabas = re.match(
         r"^"
         + config["MQTT"]["TOPIC"]
-        + "\/megabas\/([0-7])\/output\/(0_10|triac|opto_rce|opto_fce)\/([1-8])$",
+        + "\/megabas\/([0-7])\/output\/(0_10|triac|cont_edge)\/(\d+)$",
         str(msg.topic),
     )
     relind8 = re.match(
-        r"^" + config["MQTT"]["TOPIC"] + "\/8relind\/([0-7])\/output\/(relay)/([1-8])$",
+        r"^" + config["MQTT"]["TOPIC"] + "\/8relind\/([0-7])\/output\/(relay)\/(\d+)$",
         str(msg.topic),
     )
     inpind16 = re.match(
         r"^"
         + config["MQTT"]["TOPIC"]
-        + "\/16inpind\/([0-7])\/output\/(opto_rce|opto_fce|opto_rst)\/([1-16])$",
+        + "\/16inpind\/([0-7])\/output\/(opto_edge|opto_rst)\/(\d+)$",
         str(msg.topic),
     )
     heartbeat = re.match(
