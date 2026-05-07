@@ -3,7 +3,6 @@
 import logging
 import paho.mqtt.client as mqtt
 import configparser
-import logging
 import operator
 import copy
 import json
@@ -142,6 +141,15 @@ if "HEARTBEAT" in config:
             raise AppError("Missing or empty config entry HEARTBEAT/" + key)
 else:
     raise AppError("Missing config section HEARTBEAT")
+
+if "RUNTIME" in config:
+    for key in ["MAX_ERROR", "RESTART_DELAY", "TELE_INTERVAL"]:
+        if not config["RUNTIME"][key]:
+            logger.error("Missing or empty config entry RUNTIME/" + key)
+            raise AppError("Missing or empty config entry RUNTIME/" + key)
+else:
+    logger.error("Missing config section RUNTIME")
+    raise AppError("Missing config section RUNTIME")
 
 
 for stack in cards.keys():
@@ -1200,7 +1208,7 @@ def cards_unsubscribe() -> None:
 def cards_tele(mode: int) -> bool:
     global last_tele
     now = time.time()
-    if now - last_tele > 300 or mode == 1:
+    if now - last_tele > int(config["RUNTIME"]["TELE_INTERVAL"]) or mode == 1:
         get_time()
         for stack in cards.keys():
             if cards[stack] == "megaind":
@@ -1335,6 +1343,13 @@ def mqtt_cleanup() -> None:
         client.loop_stop()
         if client.is_connected():
             cards_unsubscribe()
+            # Sent LWT update
+            client.publish(
+                config["MQTT"]["TOPIC"] + "/tele/LWT",
+                payload="Offline",
+                qos=0,
+                retain=True,
+            )
             client.disconnect()
         client = None
 
@@ -1352,7 +1367,7 @@ def mqtt_on_disconnect(client: mqtt.Client, userdata: Any, rc: int) -> None:
     client.connected_flag = 0
     if rc != 0:
         logger.error("MQTT unexpected disconnect return code " + str(rc))
-        logger.info("MQTT client disconnected")
+    logger.info("MQTT client disconnected")
 
 
 # The callback for when a PUBLISH message is received from the server.
@@ -1480,7 +1495,7 @@ while True:
                 pass
             restart += 1
             # Try to reconnect later
-            time.sleep(10)
+            time.sleep(int(config["RUNTIME"]["RESTART_DELAY"]))
         elif type(error) in [KeyboardInterrupt, SystemExit]:
             # Graceful shutdown
             logger.error("Gracefully terminating application")

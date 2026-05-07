@@ -1,3 +1,6 @@
+[LOGGING]
+LEVEL = info
+
 [MQTT]
 TOPIC = sequent_control
 SERVER = 192.168.1.1
@@ -6,6 +9,7 @@ QOS = 1
 TIMEOUT = 5
 USER = mqttuser
 PASS = mqttpass
+BIRTH_TOPIC = homeassistant/status
 
 [CARDS]
 STACK0 = megaind
@@ -28,4 +32,9 @@ RESET = 10
 TIMEOUT = 300
 TOPIC_CHALLENGE = heartbeat/ping
 TOPIC_RESPONSE = heartbeat/pong
+
+[RUNTIME]
+TELE_INTERVAL = 300
+MAX_ERROR = 0
+RESTART_DELAY = 15
 
