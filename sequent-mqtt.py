@@ -1281,15 +1281,40 @@ def check_heartbeat(mode: int) -> None:
         raise AppError("Missing heartbeat, all cards outputs reseted!")
 
 
+def get_uptime_seconds() -> int:
+    # Support different uptime package APIs and fallback to /proc/uptime.
+    try:
+        fn = getattr(uptime, "uptime", None)
+        if callable(fn):
+            return int(fn())
+
+        fn = getattr(uptime, "boottime", None)
+        if callable(fn):
+            boot = fn()
+            if isinstance(boot, datetime.datetime):
+                return int((datetime.datetime.now() - boot).total_seconds())
+            return int(time.time() - float(boot))
+
+        with open("/proc/uptime", "r", encoding="utf-8") as f:
+            return int(float(f.read().split()[0]))
+    except Exception as error:
+        logger.warning(f"Could not determine system uptime: {error}")
+        return 0
+
+
 def get_time() -> None:
     result = ""
-    time = uptime.uptime()
-    result = "%01d" % int(time / 86400)
-    time = time % 86400
-    result = result + "T" + "%02d" % (int(time / 3600))
-    time = time % 3600
+    uptime_seconds = get_uptime_seconds()
+    result = "%01d" % int(uptime_seconds / 86400)
+    uptime_seconds = uptime_seconds % 86400
+    result = result + "T" + "%02d" % (int(uptime_seconds / 3600))
+    uptime_seconds = uptime_seconds % 3600
     tele["Uptime"] = (
-        result + ":" + "%02d" % (int(time / 60)) + ":" + "%02d" % (time % 60)
+        result
+        + ":"
+        + "%02d" % (int(uptime_seconds / 60))
+        + ":"
+        + "%02d" % (uptime_seconds % 60)
     )
     tele["Time"] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 
@@ -1298,7 +1323,7 @@ def mqtt_init() -> None:
     global client
 
     # Create mqtt client
-    client = mqtt.Client()
+    client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION2)
     # Register LWT message
     client.will_set(
         config["MQTT"]["TOPIC"] + "/tele/LWT", payload="Offline", qos=0, retain=True
@@ -1354,53 +1379,64 @@ def mqtt_cleanup() -> None:
         client = None
 
 
-# The callback for when the client receives a CONNACK response from the server.
-def mqtt_on_connect(client: mqtt.Client, userdata: Any, flags: Any, rc: int) -> None:
-    if rc != 0:
-        logger.error("MQTT unexpected connect return code " + str(rc))
+def mqtt_on_connect(
+    client: mqtt.Client,
+    userdata: Any,
+    flags: dict,
+    reason_code: int,
+    properties: mqtt.Properties,
+):
+    if reason_code != 0:
+        logger.error("MQTT unexpected connect return code " + str(reason_code))
     else:
         logger.info("MQTT client connected")
         client.connected_flag = 1
 
 
-def mqtt_on_disconnect(client: mqtt.Client, userdata: Any, rc: int) -> None:
+def mqtt_on_disconnect(
+    client: mqtt.Client,
+    userdata: Any,
+    flags: dict,
+    reason_code: int,
+    properties: mqtt.Properties,
+):
     client.connected_flag = 0
-    if rc != 0:
-        logger.error("MQTT unexpected disconnect return code " + str(rc))
+    if reason_code != 0:
+        logger.error("MQTT unexpected disconnect return code " + str(reason_code))
     logger.info("MQTT client disconnected")
 
 
 # The callback for when a PUBLISH message is received from the server.
 def mqtt_on_message(client: mqtt.Client, userdata: Any, msg: mqtt.MQTTMessage) -> None:
     tele = re.match(
-        r"^" + config["MQTT"]["TOPIC"] + "\/tele/cmnd\/(state)$", str(msg.topic)
+        r"^" + config["MQTT"]["TOPIC"] + "/tele/cmnd/(state)$", str(msg.topic)
     )
     megaind = re.match(
         r"^"
         + config["MQTT"]["TOPIC"]
-        + "\/megaind\/([0-7])\/output\/(0_10|4_20|pwm|led|opto_edge|opto_rst)\/(\d+)$",
+        + "/megaind/([0-7])/output/(0_10|4_20|pwm|led|opto_edge|opto_rst)/([0-9]+)$",
         str(msg.topic),
     )
     megabas = re.match(
         r"^"
         + config["MQTT"]["TOPIC"]
-        + "\/megabas\/([0-7])\/output\/(0_10|triac|cont_edge)\/(\d+)$",
+        + "/megabas/([0-7])/output/(0_10|triac|cont_edge)/([0-9]+)$",
         str(msg.topic),
     )
     relind8 = re.match(
-        r"^" + config["MQTT"]["TOPIC"] + "\/8relind\/([0-7])\/output\/(relay)\/(\d+)$",
+        r"^" + config["MQTT"]["TOPIC"] + "/8relind/([0-7])/output/(relay)/([0-9]+)$",
         str(msg.topic),
     )
     inpind16 = re.match(
         r"^"
         + config["MQTT"]["TOPIC"]
-        + "\/16inpind\/([0-7])\/output\/(opto_edge|opto_rst)\/(\d+)$",
+        + "/16inpind/([0-7])/output/(opto_edge|opto_rst)/([0-9]+)$",
         str(msg.topic),
     )
     heartbeat = re.match(
         r"^"
         + config["MQTT"]["TOPIC"]
-        + "\/"
+        + "/"
         + config["HEARTBEAT"]["TOPIC_CHALLENGE"]
         + "$",
         str(msg.topic),
