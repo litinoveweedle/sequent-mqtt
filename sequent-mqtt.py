@@ -12,6 +12,7 @@ import datetime
 import re
 import sys
 import traceback
+import signal
 from typing import Any
 
 
@@ -35,6 +36,16 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger(__name__)
+
+
+# Explicitly handle termination signals to allow graceful shutdown
+def handle_termination_signal(signum: int, frame: Any) -> None:
+    logger.error(f"Received signal {signum}, requesting graceful shutdown")
+    raise SystemExit(0)
+
+
+signal.signal(signal.SIGTERM, handle_termination_signal)
+signal.signal(signal.SIGINT, handle_termination_signal)
 
 
 # global variables
@@ -1111,7 +1122,7 @@ def cards_init() -> None:
     )
     cards_tele(1)
     for stack in cards.keys():
-        # Subscribe for any card commands
+        # Subscribe for output commands only for cards with response topics
         if "response" in cache[stack]:
             logging.debug(
                 f"Subscribing for output commands for stack {stack} of type {cards[stack]}"
@@ -1126,6 +1137,7 @@ def cards_init() -> None:
                 int(config["MQTT"]["QOS"]),
             )
 
+        # Publish initial card state
         if cards[stack] == "megaind":
             get_megaind(stack, 1)
         elif cards[stack] == "megabas":
@@ -1140,6 +1152,13 @@ def cards_init() -> None:
             get_rtd(stack, 1)
         else:
             raise AppError("Uknown card type " + cards[stack])
+
+        logger.info(
+            "Initial stack state: stack=%s type=%s state=%s",
+            stack,
+            cards[stack],
+            json.dumps(cache[stack], sort_keys=True),
+        )
 
     # Subscribe for heartbeat challenge messages
     client.subscribe(
@@ -1278,6 +1297,7 @@ def check_heartbeat(mode: int) -> None:
             elif cards[stack] == "8relind":
                 reset_8relind(stack)
         last_heartbeat = -1
+        logger.error("Missing heartbeat, all cards outputs reseted!")
         raise AppError("Missing heartbeat, all cards outputs reseted!")
 
 
