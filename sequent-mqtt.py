@@ -1316,9 +1316,11 @@ def cards_watchdog(mode: int) -> bool:
         last_watchdog = now
         if cards[stack] == "megaind":
             watchdog_megaind(stack, mode)
+            logger.debug("Card watchdog set completed")
             return True
         elif cards[stack] == "megabas":
             watchdog_megabas(stack, mode)
+            logger.debug("Card watchdog set completed")
             return True
     return True
 
