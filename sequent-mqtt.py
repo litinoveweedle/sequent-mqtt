@@ -361,7 +361,7 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
     if output == "0_10" and 1 <= channel <= 4 and 0 <= value <= 10:
         try:
             megaind.set0_10Out(stack, channel, value)
-            value == megaind.get0_10Out(stack, channel)
+            value = megaind.get0_10Out(stack, channel)
             client.publish(
                 config["MQTT"]["TOPIC"]
                 + "/megaind/"
@@ -371,7 +371,7 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
-        except:
+        except Exception as error:
             raise AppError(
                 "Can't set megaind stack: "
                 + str(stack)
@@ -379,13 +379,15 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
                 + str(channel)
                 + " to value: "
                 + str(value)
-            )
+                + "; error: "
+                + str(error)
+            ) from error
         else:
             cache[stack]["response"]["0_10"][channel - 1] = value
     elif output == "4_20" and 1 <= channel <= 4 and 4 <= value <= 20:
         try:
             megaind.set4_20Out(stack, channel, value)
-            value == megaind.get0_10Out(stack, channel)
+            value = megaind.get0_10Out(stack, channel)
             client.publish(
                 config["MQTT"]["TOPIC"]
                 + "/megaind/"
@@ -395,7 +397,7 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
-        except:
+        except Exception as error:
             raise AppError(
                 "Can't set megaind stack: "
                 + str(stack)
@@ -403,7 +405,9 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
                 + str(channel)
                 + " to value: "
                 + str(value)
-            )
+                + "; error: "
+                + str(error)
+            ) from error
         else:
             cache[stack]["response"]["4_20"][channel - 1] = value
     elif output == "pwm" and 1 <= channel <= 4 and 0 <= value <= 100:
@@ -419,7 +423,7 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
-        except:
+        except Exception as error:
             raise AppError(
                 "Can't set megaind stack: "
                 + str(stack)
@@ -427,7 +431,9 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
                 + str(channel)
                 + " to value: "
                 + str(value)
-            )
+                + "; error: "
+                + str(error)
+            ) from error
         else:
             cache[stack]["response"]["pwm"][channel - 1] = value
     elif output == "led" and 1 <= channel <= 4 and value in [0, 1]:
@@ -443,7 +449,7 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
-        except:
+        except Exception as error:
             raise AppError(
                 "Can't set megaind stack: "
                 + str(stack)
@@ -451,7 +457,9 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
                 + str(channel)
                 + " to value: "
                 + str(value)
-            )
+                + "; error: "
+                + str(error)
+            ) from error
         else:
             cache[stack]["response"]["led"][channel - 1] = value
     elif output == "opto_edge" and 1 <= channel <= 4 and value in [0, 1, 2, 3]:
@@ -472,7 +480,7 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
-        except:
+        except Exception as error:
             raise AppError(
                 "Can't set megaind stack: "
                 + str(stack)
@@ -480,7 +488,9 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
                 + str(channel)
                 + " to value: "
                 + str(value)
-            )
+                + "; error: "
+                + str(error)
+            ) from error
         else:
             cache[stack]["response"]["opto_edge"][channel - 1] = value
     elif output == "opto_rst" and 1 <= channel <= 4 and value in [0, 1]:
@@ -515,14 +525,16 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
                 0,
                 int(config["MQTT"]["QOS"]),
             )
-        except:
+        except Exception as error:
             raise AppError(
                 "Can't set megaind stack: "
                 + str(stack)
                 + ", response: opto_rst, channel: "
                 + str(channel)
                 + " to value: 1"
-            )
+                + "; error: "
+                + str(error)
+            ) from error
         else:
             cache[stack]["input"]["opto_count"][channel - 1] = value
     else:
@@ -563,47 +575,60 @@ def watchdog_megaind(stack: int, mode: int) -> bool:
         if megaind.wdtGetPeriod(stack) != int(config["WATCHDOG"]["TIMEOUT"]):
             try:
                 megaind.wdtSetPeriod(stack, int(config["WATCHDOG"]["TIMEOUT"]))
-            except:
+            except Exception as error:
                 raise AppError(
                     "Can't set watchdog period for megaind stack: "
                     + str(stack)
                     + " to value: "
                     + config["WATCHDOG"]["TIMEOUT"]
-                )
+                    + "; error: "
+                    + str(error)
+                ) from error
         if megaind.wdtGetDefaultPeriod(stack) != int(config["WATCHDOG"]["BOOT"]):
             try:
                 megaind.wdtSetDefaultPeriod(stack, int(config["WATCHDOG"]["BOOT"]))
-            except:
+            except Exception as error:
                 raise AppError(
                     "Can't set watchdog default period for megaind stack: "
                     + str(stack)
                     + " to value: "
                     + config["WATCHDOG"]["BOOT"]
-                )
+                    + "; error: "
+                    + str(error)
+                ) from error
         if megaind.wdtGetOffInterval(stack) != int(config["WATCHDOG"]["RESET"]):
             try:
                 megaind.wdtSetOffInterval(stack, int(config["WATCHDOG"]["RESET"]))
-            except:
+            except Exception as error:
                 raise AppError(
                     "Can't set watchdog off interval for megaind stack: "
                     + str(stack)
                     + " to value: "
                     + config["WATCHDOG"]["RESET"]
-                )
+                    + "; error: "
+                    + str(error)
+                ) from error
     elif mode == 2:
         try:
             megaind.wdtSetPeriod(stack, 65000)
-        except:
+        except Exception as error:
             raise AppError(
                 "Can't set watchdog period for megaind stack: "
                 + str(stack)
                 + " to value: 65000"
-            )
+                + "; error: "
+                + str(error)
+            ) from error
     else:
         try:
             megaind.wdtReload(stack)
-        except:
-            raise AppError("Can't reload watchdog for megaind stack: " + str(stack))
+        except Exception as error:
+            raise AppError(
+                "Can't reload watchdog for megaind stack: "
+                + str(stack)
+                + "; error: "
+                + str(error)
+            ) from error
     return True
 
 
@@ -664,7 +689,7 @@ def get_megabas(stack: int, init: int) -> None:
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
-            cache[stack]["input"]["0_10"][channel - 1] = value
+            cache[stack]["input"]["1k"][channel - 1] = value
 
         value = round(megabas.getRIn10K(stack, channel), 2)
         if init or value != cache[stack]["input"]["10k"][channel - 1]:
@@ -735,7 +760,7 @@ def set_megabas(stack: int, output: str, channel: int, value: int) -> None:
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
-        except:
+        except Exception as error:
             raise AppError(
                 "Can't set megabas stack: "
                 + str(stack)
@@ -743,7 +768,9 @@ def set_megabas(stack: int, output: str, channel: int, value: int) -> None:
                 + str(channel)
                 + " to value: "
                 + str(value)
-            )
+                + "; error: "
+                + str(error)
+            ) from error
         else:
             cache[stack]["response"]["0_10"][channel - 1] = value
     elif output == "triac" and 1 <= channel <= 4 and value in [0, 1]:
@@ -763,7 +790,7 @@ def set_megabas(stack: int, output: str, channel: int, value: int) -> None:
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
-        except:
+        except Exception as error:
             raise AppError(
                 "Can't set megabas stack: "
                 + str(stack)
@@ -771,7 +798,9 @@ def set_megabas(stack: int, output: str, channel: int, value: int) -> None:
                 + str(channel)
                 + " to value: "
                 + str(value)
-            )
+                + "; error: "
+                + str(error)
+            ) from error
         else:
             cache[stack]["response"]["triac"][channel - 1] = value
     elif output == "cont_edge" and 1 <= channel <= 8 and value in [0, 1, 2, 3]:
@@ -787,7 +816,7 @@ def set_megabas(stack: int, output: str, channel: int, value: int) -> None:
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
-        except:
+        except Exception as error:
             raise AppError(
                 "Can't set megabas stack: "
                 + str(stack)
@@ -795,7 +824,9 @@ def set_megabas(stack: int, output: str, channel: int, value: int) -> None:
                 + str(channel)
                 + " to value: "
                 + str(value)
-            )
+                + "; error: "
+                + str(error)
+            ) from error
         else:
             cache[stack]["response"]["cont_edge"][channel - 1] = value
     else:
@@ -836,49 +867,61 @@ def watchdog_megabas(stack: int, mode: int) -> bool:
         if megabas.wdtGetPeriod(stack) != int(config["WATCHDOG"]["TIMEOUT"]):
             try:
                 megabas.wdtSetPeriod(stack, int(config["WATCHDOG"]["TIMEOUT"]))
-            except:
+            except Exception as error:
                 raise AppError(
                     "Can't set megabas stack: "
                     + str(stack)
                     + ", watchdog period to value: "
                     + str(config["WATCHDOG"]["TIMEOUT"])
-                )
+                    + "; error: "
+                    + str(error)
+                ) from error
         if megabas.wdtGetDefaultPeriod(stack) != int(config["WATCHDOG"]["BOOT"]):
             try:
                 megabas.wdtSetDefaultPeriod(stack, int(config["WATCHDOG"]["BOOT"]))
-            except:
+            except Exception as error:
                 raise AppError(
                     "Can't set megabas stack: "
                     + str(stack)
                     + ", watchdog default period to value: "
                     + str(config["WATCHDOG"]["BOOT"])
-                )
+                    + "; error: "
+                    + str(error)
+                ) from error
         if megabas.wdtGetOffInterval(stack) != int(config["WATCHDOG"]["RESET"]):
             try:
                 megabas.wdtSetOffInterval(stack, int(config["WATCHDOG"]["RESET"]))
-            except:
+            except Exception as error:
                 raise AppError(
                     "Can't set megabas stack: "
                     + str(stack)
                     + ", watchdog off interval to value: "
                     + str(config["WATCHDOG"]["RESET"])
-                )
+                    + "; error: "
+                    + str(error)
+                ) from error
     elif mode == 2:
         try:
             megabas.wdtSetPeriod(stack, 65000)
-        except:
+        except Exception as error:
             raise AppError(
                 "Can't set megabas stack: "
                 + str(stack)
                 + ", watchdog period to value: 65000"
-            )
+                + "; error: "
+                + str(error)
+            ) from error
     else:
         try:
             megabas.wdtReload(stack)
-        except:
+        except Exception as error:
             raise AppError(
-                "Can't set megabas stack: " + str(stack) + ", watchdog reload"
-            )
+                "Can't set megabas stack: "
+                + str(stack)
+                + ", watchdog reload"
+                + "; error: "
+                + str(error)
+            ) from error
     return True
 
 
@@ -912,7 +955,7 @@ def set_8relind(stack: int, output: str, channel: int, value: int) -> None:
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
-        except:
+        except Exception as error:
             raise AppError(
                 "Can't set 8relind stack: "
                 + str(stack)
@@ -920,7 +963,9 @@ def set_8relind(stack: int, output: str, channel: int, value: int) -> None:
                 + str(channel)
                 + " to value: "
                 + str(value)
-            )
+                + "; error: "
+                + str(error)
+            ) from error
         else:
             cache[stack]["response"]["relay"][channel - 1] = value
     else:
@@ -1018,7 +1063,7 @@ def set_16inpind(stack: int, output: str, channel: int, value: int) -> None:
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
-        except:
+        except Exception as error:
             raise AppError(
                 "Can't set 16inpind stack: "
                 + str(stack)
@@ -1026,7 +1071,9 @@ def set_16inpind(stack: int, output: str, channel: int, value: int) -> None:
                 + str(channel)
                 + " to value: "
                 + str(value)
-            )
+                + "; error: "
+                + str(error)
+            ) from error
         else:
             cache[stack]["response"]["opto_edge"][channel - 1] = value
     elif output == "opto_rst" and 1 <= channel <= 16 and value in [0, 1]:
@@ -1061,14 +1108,16 @@ def set_16inpind(stack: int, output: str, channel: int, value: int) -> None:
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
-        except:
+        except Exception as error:
             raise AppError(
                 "Can't set 16inpind stack: "
                 + str(stack)
                 + ", response: opto_rst, channel: "
                 + str(channel)
                 + " to value: 1"
-            )
+                + "; error: "
+                + str(error)
+            ) from error
         else:
             cache[stack]["response"]["opto_rst"][channel - 1] = value
     else:
@@ -1492,24 +1541,88 @@ def mqtt_on_message(client: mqtt.Client, userdata: Any, msg: mqtt.MQTTMessage) -
             stack = int(megaind.group(1))
             output = megaind.group(2)
             channel = int(megaind.group(3))
+            logger.debug(
+                "MQTT output command: topic=%s payload=%s retain=%s stack=%s output=%s channel=%s",
+                str(msg.topic),
+                payload,
+                msg.retain,
+                stack,
+                output,
+                channel,
+            )
             set_megaind(stack, output, channel, payload)
+            logger.debug(
+                "MQTT output applied: stack=%s output=%s channel=%s requested=%s",
+                stack,
+                output,
+                channel,
+                payload,
+            )
         elif megabas:
             stack = int(megabas.group(1))
             output = megabas.group(2)
             channel = int(megabas.group(3))
+            logger.debug(
+                "MQTT output command: topic=%s payload=%s retain=%s stack=%s output=%s channel=%s",
+                str(msg.topic),
+                payload,
+                msg.retain,
+                stack,
+                output,
+                channel,
+            )
             set_megabas(stack, output, channel, payload)
+            logger.debug(
+                "MQTT output applied: stack=%s output=%s channel=%s requested=%s",
+                stack,
+                output,
+                channel,
+                payload,
+            )
         elif relind8:
             stack = int(relind8.group(1))
             output = relind8.group(2)
             channel = int(relind8.group(3))
+            logger.debug(
+                "MQTT output command: topic=%s payload=%s retain=%s stack=%s output=%s channel=%s",
+                str(msg.topic),
+                payload,
+                msg.retain,
+                stack,
+                output,
+                channel,
+            )
             set_8relind(stack, output, channel, payload)
+            logger.debug(
+                "MQTT output applied: stack=%s output=%s channel=%s requested=%s",
+                stack,
+                output,
+                channel,
+                payload,
+            )
         elif inpind16:
             stack = int(inpind16.group(1))
             output = inpind16.group(2)
             channel = int(inpind16.group(3))
+            logger.debug(
+                "MQTT output command: topic=%s payload=%s retain=%s stack=%s output=%s channel=%s",
+                str(msg.topic),
+                payload,
+                msg.retain,
+                stack,
+                output,
+                channel,
+            )
             set_16inpind(stack, output, channel, payload)
+            logger.debug(
+                "MQTT output applied: stack=%s output=%s channel=%s requested=%s",
+                stack,
+                output,
+                channel,
+                payload,
+            )
         else:
-            raise AppError(
+            logger.warning(
                 "Unknown MQTT topic: " + str(msg.topic) + ", Message: " + str(payload)
             )
 

@@ -24,6 +24,9 @@ Environment=PYTHONUNBUFFERED=1
 
 # Automatically restart the service if it crashes
 Restart=on-failure
+RestartSec=10s
+KillSignal=SIGTERM
+TimeoutStopSec=30s
 
 # Use a dedicated user to run our service
 User=pi
