@@ -3,11 +3,9 @@
 import logging
 import paho.mqtt.client as mqtt
 import configparser
-import operator
 import copy
 import json
 import time
-import uptime
 import datetime
 import re
 import sys
@@ -215,12 +213,8 @@ def get_megaind(stack: int, init: int) -> None:
     for channel in range(1, 5):
         value = megaind.get0_10Out(stack, channel)
         if init or value != cache[stack]["response"]["0_10"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megaind/"
-                + str(stack)
-                + "/response/0_10/"
-                + str(channel),
+            mqtt_publish(
+                "megaind/" + str(stack) + "/response/0_10/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -228,12 +222,8 @@ def get_megaind(stack: int, init: int) -> None:
 
         value = megaind.get4_20Out(stack, channel)
         if init or value != cache[stack]["response"]["4_20"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megaind/"
-                + str(stack)
-                + "/response/4_20/"
-                + str(channel),
+            mqtt_publish(
+                "megaind/" + str(stack) + "/response/4_20/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -241,12 +231,8 @@ def get_megaind(stack: int, init: int) -> None:
 
         value = megaind.getOdPWM(stack, channel)
         if init or value != cache[stack]["response"]["pwm"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megaind/"
-                + str(stack)
-                + "/response/pwm/"
-                + str(channel),
+            mqtt_publish(
+                "megaind/" + str(stack) + "/response/pwm/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -254,12 +240,8 @@ def get_megaind(stack: int, init: int) -> None:
 
         value = megaind.getLed(stack, channel)
         if init or value != cache[stack]["response"]["led"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megaind/"
-                + str(stack)
-                + "/response/led/"
-                + str(channel),
+            mqtt_publish(
+                "megaind/" + str(stack) + "/response/led/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -267,12 +249,8 @@ def get_megaind(stack: int, init: int) -> None:
 
         value = megaind.getOptoRisingCountEnable(stack, channel)
         if init or value != cache[stack]["response"]["opto_edge"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megaind/"
-                + str(stack)
-                + "/response/opto_edge/"
-                + str(channel),
+            mqtt_publish(
+                "megaind/" + str(stack) + "/response/opto_edge/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -280,12 +258,8 @@ def get_megaind(stack: int, init: int) -> None:
 
         value = 0
         if init or value != cache[stack]["response"]["opto_rst"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megaind/"
-                + str(stack)
-                + "/response/opto_rst/"
-                + str(channel),
+            mqtt_publish(
+                "megaind/" + str(stack) + "/response/opto_rst/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -293,12 +267,8 @@ def get_megaind(stack: int, init: int) -> None:
 
         value = round(megaind.get0_10In(stack, channel), 2)
         if init or value != cache[stack]["input"]["0_10"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megaind/"
-                + str(stack)
-                + "/input/0_10/"
-                + str(channel),
+            mqtt_publish(
+                "megaind/" + str(stack) + "/input/0_10/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -306,12 +276,8 @@ def get_megaind(stack: int, init: int) -> None:
 
         value = round(megaind.getpm10In(stack, channel), 2)
         if init or value != cache[stack]["input"]["pm0_10"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megaind/"
-                + str(stack)
-                + "/input/pm0_10/"
-                + str(channel),
+            mqtt_publish(
+                "megaind/" + str(stack) + "/input/pm0_10/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -319,12 +285,8 @@ def get_megaind(stack: int, init: int) -> None:
 
         value = megaind.get4_20In(stack, channel)
         if init or value != cache[stack]["input"]["4_20"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megaind/"
-                + str(stack)
-                + "/input/4_20/"
-                + str(channel),
+            mqtt_publish(
+                "megaind/" + str(stack) + "/input/4_20/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -332,12 +294,8 @@ def get_megaind(stack: int, init: int) -> None:
 
         value = megaind.getOptoCh(stack, channel)
         if init or value != cache[stack]["input"]["opto"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megaind/"
-                + str(stack)
-                + "/input/opto/"
-                + str(channel),
+            mqtt_publish(
+                "megaind/" + str(stack) + "/input/opto/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -345,12 +303,8 @@ def get_megaind(stack: int, init: int) -> None:
 
         value = megaind.getOptoCount(stack, channel)
         if init or value != cache[stack]["input"]["opto_count"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megaind/"
-                + str(stack)
-                + "/input/opto_count/"
-                + str(channel),
+            mqtt_publish(
+                "megaind/" + str(stack) + "/input/opto_count/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -359,186 +313,113 @@ def get_megaind(stack: int, init: int) -> None:
 
 def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
     if output == "0_10" and 1 <= channel <= 4 and 0 <= value <= 10:
-        try:
-            megaind.set0_10Out(stack, channel, value)
-            value = megaind.get0_10Out(stack, channel)
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megaind/"
-                + str(stack)
-                + "/response/0_10/"
-                + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
-            )
-        except Exception as error:
-            raise AppError(
-                "Can't set megaind stack: "
-                + str(stack)
-                + ", response: 0_10, channel: "
-                + str(channel)
-                + " to value: "
-                + str(value)
-                + "; error: "
-                + str(error)
-            ) from error
-        else:
-            cache[stack]["response"]["0_10"][channel - 1] = value
+        logger.debug(
+            "Setting megaind stack: %s, response: 0_10, channel: %s to value: %s",
+            stack,
+            channel,
+            value,
+        )
+        megaind.set0_10Out(stack, channel, value)
+        value = megaind.get0_10Out(stack, channel)
+        mqtt_publish(
+            "megaind/" + str(stack) + "/response/0_10/" + str(channel),
+            str(value),
+            int(config["MQTT"]["QOS"]),
+        )
+        cache[stack]["response"]["0_10"][channel - 1] = value
     elif output == "4_20" and 1 <= channel <= 4 and 4 <= value <= 20:
-        try:
-            megaind.set4_20Out(stack, channel, value)
-            value = megaind.get0_10Out(stack, channel)
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megaind/"
-                + str(stack)
-                + "/response/4_20/"
-                + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
-            )
-        except Exception as error:
-            raise AppError(
-                "Can't set megaind stack: "
-                + str(stack)
-                + ", response: 4_20, channel: "
-                + str(channel)
-                + " to value: "
-                + str(value)
-                + "; error: "
-                + str(error)
-            ) from error
-        else:
-            cache[stack]["response"]["4_20"][channel - 1] = value
+        logger.debug(
+            "Setting megaind stack: %s, response: 4_20, channel: %s to value: %s",
+            stack,
+            channel,
+            value,
+        )
+        megaind.set4_20Out(stack, channel, value)
+        value = megaind.get4_20Out(stack, channel)
+        mqtt_publish(
+            "megaind/" + str(stack) + "/response/4_20/" + str(channel),
+            str(value),
+            int(config["MQTT"]["QOS"]),
+        )
+        cache[stack]["response"]["4_20"][channel - 1] = value
     elif output == "pwm" and 1 <= channel <= 4 and 0 <= value <= 100:
-        try:
-            megaind.setOdPWM(stack, channel, value)
-            value = megaind.getOdPWM(stack, channel)
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megaind/"
-                + str(stack)
-                + "/response/pwm/"
-                + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
-            )
-        except Exception as error:
-            raise AppError(
-                "Can't set megaind stack: "
-                + str(stack)
-                + ", response: pwm, channel: "
-                + str(channel)
-                + " to value: "
-                + str(value)
-                + "; error: "
-                + str(error)
-            ) from error
-        else:
-            cache[stack]["response"]["pwm"][channel - 1] = value
+        logger.debug(
+            "Setting megaind stack: %s, response: pwm, channel: %s to value: %s",
+            stack,
+            channel,
+            value,
+        )
+        megaind.setOdPWM(stack, channel, value)
+        value = megaind.getOdPWM(stack, channel)
+        mqtt_publish(
+            "megaind/" + str(stack) + "/response/pwm/" + str(channel),
+            str(value),
+            int(config["MQTT"]["QOS"]),
+        )
+        cache[stack]["response"]["pwm"][channel - 1] = value
     elif output == "led" and 1 <= channel <= 4 and value in [0, 1]:
-        try:
-            megaind.setLed(stack, channel, value)
-            value = megaind.getLed(stack, channel)
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megaind/"
-                + str(stack)
-                + "/response/led/"
-                + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
-            )
-        except Exception as error:
-            raise AppError(
-                "Can't set megaind stack: "
-                + str(stack)
-                + ", response: led, channel: "
-                + str(channel)
-                + " to value: "
-                + str(value)
-                + "; error: "
-                + str(error)
-            ) from error
-        else:
-            cache[stack]["response"]["led"][channel - 1] = value
+        logger.debug(
+            "Setting megaind stack: %s, response: led, channel: %s to value: %s",
+            stack,
+            channel,
+            value,
+        )
+        megaind.setLed(stack, channel, value)
+        value = megaind.getLed(stack, channel)
+        mqtt_publish(
+            "megaind/" + str(stack) + "/response/led/" + str(channel),
+            str(value),
+            int(config["MQTT"]["QOS"]),
+        )
+        cache[stack]["response"]["led"][channel - 1] = value
     elif output == "opto_edge" and 1 <= channel <= 4 and value in [0, 1, 2, 3]:
-        try:
-            rce = (value >> 0) & 1
-            fce = (value >> 1) & 1
-            megaind.setOptoRisingCountEnable(stack, channel, rce)
-            megaind.setOptoFallingCountEnable(stack, channel, fce)
-            rce = megaind.getOptoRisingCountEnable(stack, channel)
-            fce = megaind.getOptoFallingCountEnable(stack, channel)
-            value = (rce << 0) | (fce << 1)
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megaind/"
-                + str(stack)
-                + "/response/opto_edge/"
-                + str(channel),
+        logger.debug(
+            "Setting megaind stack: %s, response: opto_edge, channel: %s to value: %s",
+            stack,
+            channel,
+            value,
+        )
+        rce = (value >> 0) & 1
+        fce = (value >> 1) & 1
+        megaind.setOptoRisingCountEnable(stack, channel, rce)
+        megaind.setOptoFallingCountEnable(stack, channel, fce)
+        rce = megaind.getOptoRisingCountEnable(stack, channel)
+        fce = megaind.getOptoFallingCountEnable(stack, channel)
+        value = (rce << 0) | (fce << 1)
+        mqtt_publish(
+            "megaind/" + str(stack) + "/response/opto_edge/" + str(channel),
+            str(value),
+            int(config["MQTT"]["QOS"]),
+        )
+        cache[stack]["response"]["opto_edge"][channel - 1] = value
+    elif output == "opto_rst" and 1 <= channel <= 4 and value in [0, 1]:
+        logger.debug(
+            "Setting megaind stack: %s, response: opto_rst, channel: %s to value: %s",
+            stack,
+            channel,
+            value,
+        )
+        if value == 1:
+            megaind.rstOptoCount(stack, channel)
+            value = megaind.getOptoCount(stack, channel)
+            mqtt_publish(
+                "megaind/" + str(stack) + "/response/opto_rst/" + str(channel),
+                1,
+                int(config["MQTT"]["QOS"]),
+            )
+            mqtt_publish(
+                "megaind/" + str(stack) + "/input/opto_count/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
-        except Exception as error:
-            raise AppError(
-                "Can't set megaind stack: "
-                + str(stack)
-                + ", response: opto_edge, channel: "
-                + str(channel)
-                + " to value: "
-                + str(value)
-                + "; error: "
-                + str(error)
-            ) from error
-        else:
-            cache[stack]["response"]["opto_edge"][channel - 1] = value
-    elif output == "opto_rst" and 1 <= channel <= 4 and value in [0, 1]:
-        try:
-            if value == 1:
-                megaind.rstOptoCount(stack, channel)
-                value = megaind.getOptoCount(stack, channel)
-                client.publish(
-                    config["MQTT"]["TOPIC"]
-                    + "/megaind/"
-                    + str(stack)
-                    + "/response/opto_rst/"
-                    + str(channel),
-                    1,
-                    int(config["MQTT"]["QOS"]),
-                )
-                client.publish(
-                    config["MQTT"]["TOPIC"]
-                    + "/megaind/"
-                    + str(stack)
-                    + "/input/opto_count/"
-                    + str(channel),
-                    str(value),
-                    int(config["MQTT"]["QOS"]),
-                )
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megaind/"
-                + str(stack)
-                + "/response/opto_rst/"
-                + str(channel),
-                0,
-                int(config["MQTT"]["QOS"]),
-            )
-        except Exception as error:
-            raise AppError(
-                "Can't set megaind stack: "
-                + str(stack)
-                + ", response: opto_rst, channel: "
-                + str(channel)
-                + " to value: 1"
-                + "; error: "
-                + str(error)
-            ) from error
-        else:
-            cache[stack]["input"]["opto_count"][channel - 1] = value
+        mqtt_publish(
+            "megaind/" + str(stack) + "/response/opto_rst/" + str(channel),
+            0,
+            int(config["MQTT"]["QOS"]),
+        )
+        cache[stack]["input"]["opto_count"][channel - 1] = value
     else:
-        raise AppError(
+        logger.error(
             "Can't set megaind stack: "
             + str(stack)
             + ", topic: "
@@ -551,9 +432,11 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
 
 
 def reset_megaind(stack: int) -> None:
-    for channel in range(1, 5):
-        for output in ("4_20", "0_10", "pwm", "led"):
-            set_megaind(stack, output, channel, 0)
+    for output in defaults["megaind"]["response"].keys():
+        for channel in defaults["megaind"]["response"][output].keys():
+            set_megaind(
+                stack, output, channel, defaults["megaind"]["response"][output][channel]
+            )
 
 
 def tele_megaind(stack: int) -> bool:
@@ -573,62 +456,32 @@ def watchdog_megaind(stack: int, mode: int) -> bool:
         return False
     if mode == 1:
         if megaind.wdtGetPeriod(stack) != int(config["WATCHDOG"]["TIMEOUT"]):
-            try:
-                megaind.wdtSetPeriod(stack, int(config["WATCHDOG"]["TIMEOUT"]))
-            except Exception as error:
-                raise AppError(
-                    "Can't set watchdog period for megaind stack: "
-                    + str(stack)
-                    + " to value: "
-                    + config["WATCHDOG"]["TIMEOUT"]
-                    + "; error: "
-                    + str(error)
-                ) from error
+            logger.debug(
+                "Setting megaind watchdog period: stack=%s value=%s",
+                stack,
+                config["WATCHDOG"]["TIMEOUT"],
+            )
+            megaind.wdtSetPeriod(stack, int(config["WATCHDOG"]["TIMEOUT"]))
         if megaind.wdtGetDefaultPeriod(stack) != int(config["WATCHDOG"]["BOOT"]):
-            try:
-                megaind.wdtSetDefaultPeriod(stack, int(config["WATCHDOG"]["BOOT"]))
-            except Exception as error:
-                raise AppError(
-                    "Can't set watchdog default period for megaind stack: "
-                    + str(stack)
-                    + " to value: "
-                    + config["WATCHDOG"]["BOOT"]
-                    + "; error: "
-                    + str(error)
-                ) from error
+            logger.debug(
+                "Setting megaind watchdog default period: stack=%s value=%s",
+                stack,
+                config["WATCHDOG"]["BOOT"],
+            )
+            megaind.wdtSetDefaultPeriod(stack, int(config["WATCHDOG"]["BOOT"]))
         if megaind.wdtGetOffInterval(stack) != int(config["WATCHDOG"]["RESET"]):
-            try:
-                megaind.wdtSetOffInterval(stack, int(config["WATCHDOG"]["RESET"]))
-            except Exception as error:
-                raise AppError(
-                    "Can't set watchdog off interval for megaind stack: "
-                    + str(stack)
-                    + " to value: "
-                    + config["WATCHDOG"]["RESET"]
-                    + "; error: "
-                    + str(error)
-                ) from error
+            logger.debug(
+                "Setting megaind watchdog off interval: stack=%s value=%s",
+                stack,
+                config["WATCHDOG"]["RESET"],
+            )
+            megaind.wdtSetOffInterval(stack, int(config["WATCHDOG"]["RESET"]))
     elif mode == 2:
-        try:
-            megaind.wdtSetPeriod(stack, 65000)
-        except Exception as error:
-            raise AppError(
-                "Can't set watchdog period for megaind stack: "
-                + str(stack)
-                + " to value: 65000"
-                + "; error: "
-                + str(error)
-            ) from error
+        logger.debug("Disabling megaind watchdog: stack=%s", stack)
+        megaind.wdtSetPeriod(stack, 65000)
     else:
-        try:
-            megaind.wdtReload(stack)
-        except Exception as error:
-            raise AppError(
-                "Can't reload watchdog for megaind stack: "
-                + str(stack)
-                + "; error: "
-                + str(error)
-            ) from error
+        logger.debug("Reloading megaind watchdog: stack=%s", stack)
+        megaind.wdtReload(stack)
     return True
 
 
@@ -637,12 +490,8 @@ def get_megabas(stack: int, init: int) -> None:
     for channel in range(1, 5):
         value = megabas.getUOut(stack, channel)
         if init or value != cache[stack]["response"]["0_10"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megabas/"
-                + str(stack)
-                + "/response/0_10/"
-                + str(channel),
+            mqtt_publish(
+                "megabas/" + str(stack) + "/response/0_10/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -653,12 +502,8 @@ def get_megabas(stack: int, init: int) -> None:
         else:
             value = 0
         if init or value != cache[stack]["response"]["triac"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megabas/"
-                + str(stack)
-                + "/response/triac/"
-                + str(channel),
+            mqtt_publish(
+                "megabas/" + str(stack) + "/response/triac/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -667,12 +512,8 @@ def get_megabas(stack: int, init: int) -> None:
     for channel in range(1, 9):
         value = round(megabas.getUIn(stack, channel), 2)
         if init or value != cache[stack]["input"]["0_10"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megabas/"
-                + str(stack)
-                + "/input/0_10/"
-                + str(channel),
+            mqtt_publish(
+                "megabas/" + str(stack) + "/input/0_10/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -680,12 +521,8 @@ def get_megabas(stack: int, init: int) -> None:
 
         value = round(megabas.getRIn1K(stack, channel), 2)
         if init or value != cache[stack]["input"]["1k"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megabas/"
-                + str(stack)
-                + "/input/1k/"
-                + str(channel),
+            mqtt_publish(
+                "megabas/" + str(stack) + "/input/1k/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -693,12 +530,8 @@ def get_megabas(stack: int, init: int) -> None:
 
         value = round(megabas.getRIn10K(stack, channel), 2)
         if init or value != cache[stack]["input"]["10k"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megabas/"
-                + str(stack)
-                + "/input/10k/"
-                + str(channel),
+            mqtt_publish(
+                "megabas/" + str(stack) + "/input/10k/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -706,12 +539,8 @@ def get_megabas(stack: int, init: int) -> None:
 
         value = megabas.getContactCh(stack, channel)
         if init or value != cache[stack]["input"]["cont"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megabas/"
-                + str(stack)
-                + "/input/cont/"
-                + str(channel),
+            mqtt_publish(
+                "megabas/" + str(stack) + "/input/cont/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -719,12 +548,8 @@ def get_megabas(stack: int, init: int) -> None:
 
         value = megabas.getContactCounter(stack, channel)
         if init or value != cache[stack]["input"]["cont_count"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megabas/"
-                + str(stack)
-                + "/input/cont_count/"
-                + str(channel),
+            mqtt_publish(
+                "megabas/" + str(stack) + "/input/cont_count/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -732,12 +557,8 @@ def get_megabas(stack: int, init: int) -> None:
 
         value = megabas.getContactCountEdge(stack, channel)
         if init or value != cache[stack]["response"]["cont_edge"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megabas/"
-                + str(stack)
-                + "/response/cont_edge/"
-                + str(channel),
+            mqtt_publish(
+                "megabas/" + str(stack) + "/response/cont_edge/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -748,89 +569,56 @@ def get_megabas(stack: int, init: int) -> None:
 
 def set_megabas(stack: int, output: str, channel: int, value: int) -> None:
     if output == "0_10" and 1 <= channel <= 4 and 0 <= value <= 10:
-        try:
-            megabas.setUOut(stack, channel, value)
-            value = megabas.getUOut(stack, channel)
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megabas/"
-                + str(stack)
-                + "/response/0_10/"
-                + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
-            )
-        except Exception as error:
-            raise AppError(
-                "Can't set megabas stack: "
-                + str(stack)
-                + ", response: 0_10, channel: "
-                + str(channel)
-                + " to value: "
-                + str(value)
-                + "; error: "
-                + str(error)
-            ) from error
-        else:
-            cache[stack]["response"]["0_10"][channel - 1] = value
+        logger.debug(
+            "Setting megabas stack: %s, response: 0_10, channel: %s to value: %s",
+            stack,
+            channel,
+            value,
+        )
+        megabas.setUOut(stack, channel, value)
+        value = megabas.getUOut(stack, channel)
+        mqtt_publish(
+            "megabas/" + str(stack) + "/response/0_10/" + str(channel),
+            str(value),
+            int(config["MQTT"]["QOS"]),
+        )
+        cache[stack]["response"]["0_10"][channel - 1] = value
     elif output == "triac" and 1 <= channel <= 4 and value in [0, 1]:
-        try:
-            megabas.setTriac(stack, channel, value)
-            triacs = megabas.getTriacs(stack)
-            if triacs & (1 << channel - 1):
-                value = 1
-            else:
-                value = 0
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megabas/"
-                + str(stack)
-                + "/response/triac/"
-                + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
-            )
-        except Exception as error:
-            raise AppError(
-                "Can't set megabas stack: "
-                + str(stack)
-                + ", response: triac, channel: "
-                + str(channel)
-                + " to value: "
-                + str(value)
-                + "; error: "
-                + str(error)
-            ) from error
+        logger.debug(
+            "Setting megabas stack: %s, response: triac, channel: %s to value: %s",
+            stack,
+            channel,
+            value,
+        )
+        megabas.setTriac(stack, channel, value)
+        triacs = megabas.getTriacs(stack)
+        if triacs & (1 << channel - 1):
+            value = 1
         else:
-            cache[stack]["response"]["triac"][channel - 1] = value
+            value = 0
+        mqtt_publish(
+            "megabas/" + str(stack) + "/response/triac/" + str(channel),
+            str(value),
+            int(config["MQTT"]["QOS"]),
+        )
+        cache[stack]["response"]["triac"][channel - 1] = value
     elif output == "cont_edge" and 1 <= channel <= 8 and value in [0, 1, 2, 3]:
-        try:
-            megabas.setContactCountEdge(stack, channel, value)
-            value = megabas.getContactCountEdge(stack, channel)
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/megabas/"
-                + str(stack)
-                + "/response/cont_edge/"
-                + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
-            )
-        except Exception as error:
-            raise AppError(
-                "Can't set megabas stack: "
-                + str(stack)
-                + ", response: cont_edge, channel: "
-                + str(channel)
-                + " to value: "
-                + str(value)
-                + "; error: "
-                + str(error)
-            ) from error
-        else:
-            cache[stack]["response"]["cont_edge"][channel - 1] = value
+        logger.debug(
+            "Setting megabas stack: %s, response: cont_edge, channel: %s to value: %s",
+            stack,
+            channel,
+            value,
+        )
+        megabas.setContactCountEdge(stack, channel, value)
+        value = megabas.getContactCountEdge(stack, channel)
+        mqtt_publish(
+            "megabas/" + str(stack) + "/response/cont_edge/" + str(channel),
+            str(value),
+            int(config["MQTT"]["QOS"]),
+        )
+        cache[stack]["response"]["cont_edge"][channel - 1] = value
     else:
-        raise AppError(
+        logger.error(
             "Can't set megabas stack: "
             + str(stack)
             + ", response: "
@@ -843,9 +631,11 @@ def set_megabas(stack: int, output: str, channel: int, value: int) -> None:
 
 
 def reset_megabas(stack: int) -> None:
-    for channel in range(1, 5):
-        for output in ("0_10", "triac"):
-            set_megabas(stack, output, channel, 0)
+    for output in defaults["megabas"]["response"].keys():
+        for channel in defaults["megabas"]["response"][output].keys():
+            set_megabas(
+                stack, output, channel, defaults["megabas"]["response"][output][channel]
+            )
 
 
 def tele_megabas(stack: int) -> bool:
@@ -865,63 +655,32 @@ def watchdog_megabas(stack: int, mode: int) -> bool:
         return False
     if mode == 1:
         if megabas.wdtGetPeriod(stack) != int(config["WATCHDOG"]["TIMEOUT"]):
-            try:
-                megabas.wdtSetPeriod(stack, int(config["WATCHDOG"]["TIMEOUT"]))
-            except Exception as error:
-                raise AppError(
-                    "Can't set megabas stack: "
-                    + str(stack)
-                    + ", watchdog period to value: "
-                    + str(config["WATCHDOG"]["TIMEOUT"])
-                    + "; error: "
-                    + str(error)
-                ) from error
+            logger.debug(
+                "Setting megabas watchdog period: stack=%s value=%s",
+                stack,
+                config["WATCHDOG"]["TIMEOUT"],
+            )
+            megabas.wdtSetPeriod(stack, int(config["WATCHDOG"]["TIMEOUT"]))
         if megabas.wdtGetDefaultPeriod(stack) != int(config["WATCHDOG"]["BOOT"]):
-            try:
-                megabas.wdtSetDefaultPeriod(stack, int(config["WATCHDOG"]["BOOT"]))
-            except Exception as error:
-                raise AppError(
-                    "Can't set megabas stack: "
-                    + str(stack)
-                    + ", watchdog default period to value: "
-                    + str(config["WATCHDOG"]["BOOT"])
-                    + "; error: "
-                    + str(error)
-                ) from error
+            logger.debug(
+                "Setting megabas watchdog default period: stack=%s value=%s",
+                stack,
+                config["WATCHDOG"]["BOOT"],
+            )
+            megabas.wdtSetDefaultPeriod(stack, int(config["WATCHDOG"]["BOOT"]))
         if megabas.wdtGetOffInterval(stack) != int(config["WATCHDOG"]["RESET"]):
-            try:
-                megabas.wdtSetOffInterval(stack, int(config["WATCHDOG"]["RESET"]))
-            except Exception as error:
-                raise AppError(
-                    "Can't set megabas stack: "
-                    + str(stack)
-                    + ", watchdog off interval to value: "
-                    + str(config["WATCHDOG"]["RESET"])
-                    + "; error: "
-                    + str(error)
-                ) from error
+            logger.debug(
+                "Setting megabas watchdog off interval: stack=%s value=%s",
+                stack,
+                config["WATCHDOG"]["RESET"],
+            )
+            megabas.wdtSetOffInterval(stack, int(config["WATCHDOG"]["RESET"]))
     elif mode == 2:
-        try:
-            megabas.wdtSetPeriod(stack, 65000)
-        except Exception as error:
-            raise AppError(
-                "Can't set megabas stack: "
-                + str(stack)
-                + ", watchdog period to value: 65000"
-                + "; error: "
-                + str(error)
-            ) from error
+        logger.debug("Disabling megabas watchdog: stack=%s", stack)
+        megabas.wdtSetPeriod(stack, 65000)
     else:
-        try:
-            megabas.wdtReload(stack)
-        except Exception as error:
-            raise AppError(
-                "Can't set megabas stack: "
-                + str(stack)
-                + ", watchdog reload"
-                + "; error: "
-                + str(error)
-            ) from error
+        logger.debug("Reloading megabas watchdog: stack=%s", stack)
+        megabas.wdtReload(stack)
     return True
 
 
@@ -929,12 +688,8 @@ def get_8relind(stack: int, init: int) -> None:
     for channel in range(1, 9):
         value = lib8relind.get(stack, channel)
         if init or value != cache[stack]["response"]["relay"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/8relind/"
-                + str(stack)
-                + "/response/relay/"
-                + str(channel),
+            mqtt_publish(
+                "8relind/" + str(stack) + "/response/relay/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -943,33 +698,22 @@ def get_8relind(stack: int, init: int) -> None:
 
 def set_8relind(stack: int, output: str, channel: int, value: int) -> None:
     if output == "relay" and 1 <= channel <= 8 and value in [0, 1]:
-        try:
-            lib8relind.set(stack, channel, value)
-            value = lib8relind.get(stack, channel)
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/8relind/"
-                + str(stack)
-                + "/response/relay/"
-                + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
-            )
-        except Exception as error:
-            raise AppError(
-                "Can't set 8relind stack: "
-                + str(stack)
-                + ", response: relay, channel: "
-                + str(channel)
-                + " to value: "
-                + str(value)
-                + "; error: "
-                + str(error)
-            ) from error
-        else:
-            cache[stack]["response"]["relay"][channel - 1] = value
+        logger.debug(
+            "Setting 8relind stack: %s, response: relay, channel: %s to value: %s",
+            stack,
+            channel,
+            value,
+        )
+        lib8relind.set(stack, channel, value)
+        value = lib8relind.get(stack, channel)
+        mqtt_publish(
+            "8relind/" + str(stack) + "/response/relay/" + str(channel),
+            str(value),
+            int(config["MQTT"]["QOS"]),
+        )
+        cache[stack]["response"]["relay"][channel - 1] = value
     else:
-        raise AppError(
+        logger.error(
             "Can't set 8relind stack: "
             + str(stack)
             + ", topic: "
@@ -982,8 +726,11 @@ def set_8relind(stack: int, output: str, channel: int, value: int) -> None:
 
 
 def reset_8relind(stack: int) -> None:
-    for channel in range(1, 9):
-        set_8relind(stack, "relay", channel, 0)
+    for output in defaults["8relind"]["response"].keys():
+        for channel in defaults["8relind"]["response"][output].keys():
+            set_8relind(
+                stack, output, channel, defaults["8relind"]["response"][output][channel]
+            )
 
 
 def get_16inpind(stack: int, init: int) -> None:
@@ -992,12 +739,8 @@ def get_16inpind(stack: int, init: int) -> None:
         rce = lib16inpind.getOptoEdge(stack, channel, 1)
         value = (rce << 0) | (fce << 1)
         if init or value != cache[stack]["response"]["opto_edge"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/16inpind/"
-                + str(stack)
-                + "/response/opto_edge/"
-                + str(channel),
+            mqtt_publish(
+                "16inpind/" + str(stack) + "/response/opto_edge/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -1005,12 +748,8 @@ def get_16inpind(stack: int, init: int) -> None:
 
         value = 0
         if init or value != cache[stack]["response"]["opto_rst"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/16inpind/"
-                + str(stack)
-                + "/response/opto_rst/"
-                + str(channel),
+            mqtt_publish(
+                "16inpind/" + str(stack) + "/response/opto_rst/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -1018,12 +757,8 @@ def get_16inpind(stack: int, init: int) -> None:
 
         value = lib16inpind.getOpto(stack, channel)
         if init or value != cache[stack]["input"]["opto"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/16inpind/"
-                + str(stack)
-                + "/input/opto/"
-                + str(channel),
+            mqtt_publish(
+                "16inpind/" + str(stack) + "/input/opto/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -1031,12 +766,8 @@ def get_16inpind(stack: int, init: int) -> None:
 
         value = lib16inpind.getOptoCount(stack, channel)
         if init or value != cache[stack]["input"]["opto_count"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/16inpind/"
-                + str(stack)
-                + "/input/opto_count/"
-                + str(channel),
+            mqtt_publish(
+                "16inpind/" + str(stack) + "/input/opto_count/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -1045,83 +776,54 @@ def get_16inpind(stack: int, init: int) -> None:
 
 def set_16inpind(stack: int, output: str, channel: int, value: int) -> None:
     if output == "opto_edge" and 1 <= channel <= 16 and value in [0, 1, 2, 3]:
-        try:
-            rce = (value >> 0) & 1
-            fce = (value >> 1) & 1
-            # Edge type (0=falling, 1=rising)
-            lib16inpind.setOptoEdge(stack, channel, 0, fce)
-            lib16inpind.setOptoEdge(stack, channel, 1, rce)
-            fce = lib16inpind.getOptoEdge(stack, channel, 0)
-            rce = lib16inpind.getOptoEdge(stack, channel, 1)
-            value = (rce << 0) | (fce << 1)
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/16inpind/"
-                + str(stack)
-                + "/response/opto_edge/"
-                + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
-            )
-        except Exception as error:
-            raise AppError(
-                "Can't set 16inpind stack: "
-                + str(stack)
-                + ", response: opto_edge, channel: "
-                + str(channel)
-                + " to value: "
-                + str(value)
-                + "; error: "
-                + str(error)
-            ) from error
-        else:
-            cache[stack]["response"]["opto_edge"][channel - 1] = value
+        logger.debug(
+            "Setting 16inpind stack: %s, response: opto_edge, channel: %s to value: %s",
+            stack,
+            channel,
+            value,
+        )
+        rce = (value >> 0) & 1
+        fce = (value >> 1) & 1
+        # Edge type (0=falling, 1=rising)
+        lib16inpind.setOptoEdge(stack, channel, 0, fce)
+        lib16inpind.setOptoEdge(stack, channel, 1, rce)
+        fce = lib16inpind.getOptoEdge(stack, channel, 0)
+        rce = lib16inpind.getOptoEdge(stack, channel, 1)
+        value = (rce << 0) | (fce << 1)
+        mqtt_publish(
+            "16inpind/" + str(stack) + "/response/opto_edge/" + str(channel),
+            str(value),
+            int(config["MQTT"]["QOS"]),
+        )
+        cache[stack]["response"]["opto_edge"][channel - 1] = value
     elif output == "opto_rst" and 1 <= channel <= 16 and value in [0, 1]:
-        try:
-            if value == 1:
-                lib16inpind.resetOptoCount(stack, channel, 0, value)
-                value = lib16inpind.getOptoCount(stack, channel, 0)
-                client.publish(
-                    config["MQTT"]["TOPIC"]
-                    + "/16inpind/"
-                    + str(stack)
-                    + "/response/opto_rst/"
-                    + str(channel),
-                    1,
-                    int(config["MQTT"]["QOS"]),
-                )
-                client.publish(
-                    config["MQTT"]["TOPIC"]
-                    + "/16inpind/"
-                    + str(stack)
-                    + "/input/opto_count/"
-                    + str(channel),
-                    str(value),
-                    int(config["MQTT"]["QOS"]),
-                )
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/16inpind/"
-                + str(stack)
-                + "/response/opto_rst/"
-                + str(channel),
+        logger.debug(
+            "Setting 16inpind stack: %s, response: opto_rst, channel: %s to value: %s",
+            stack,
+            channel,
+            value,
+        )
+        if value == 1:
+            lib16inpind.resetOptoCount(stack, channel, 0, value)
+            value = lib16inpind.getOptoCount(stack, channel, 0)
+            mqtt_publish(
+                "16inpind/" + str(stack) + "/response/opto_rst/" + str(channel),
+                "1",
+                int(config["MQTT"]["QOS"]),
+            )
+            mqtt_publish(
+                "16inpind/" + str(stack) + "/input/opto_count/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
-        except Exception as error:
-            raise AppError(
-                "Can't set 16inpind stack: "
-                + str(stack)
-                + ", response: opto_rst, channel: "
-                + str(channel)
-                + " to value: 1"
-                + "; error: "
-                + str(error)
-            ) from error
-        else:
-            cache[stack]["response"]["opto_rst"][channel - 1] = value
+        mqtt_publish(
+            "16inpind/" + str(stack) + "/response/opto_rst/" + str(channel),
+            str(value),
+            int(config["MQTT"]["QOS"]),
+        )
+        cache[stack]["response"]["opto_rst"][channel - 1] = value
     else:
-        raise AppError(
+        logger.error(
             "Can't set 16inpind stack: "
             + str(stack)
             + ", topic: "
@@ -1137,12 +839,8 @@ def get_8inputs(stack: int, init: int) -> None:
     for channel in range(1, 9):
         value = lib8inputs.get_opto(stack, channel)
         if init or value != cache[stack]["input"]["opto"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/8inputs/"
-                + str(stack)
-                + "/input/opto/"
-                + str(channel),
+            mqtt_publish(
+                "8inputs/" + str(stack) + "/input/opto/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -1153,12 +851,8 @@ def get_rtd(stack: int, init: int) -> None:
     for channel in range(1, 9):
         value = librtd.get(stack, channel)
         if init or value != cache[stack]["input"]["rtd"][channel - 1]:
-            client.publish(
-                config["MQTT"]["TOPIC"]
-                + "/rtd/"
-                + str(stack)
-                + "/input/rtd/"
-                + str(channel),
+            mqtt_publish(
+                "rtd/" + str(stack) + "/input/rtd/" + str(channel),
                 str(value),
                 int(config["MQTT"]["QOS"]),
             )
@@ -1200,7 +894,7 @@ def cards_init() -> None:
         elif cards[stack] == "rtd":
             get_rtd(stack, 1)
         else:
-            raise AppError("Uknown card type " + cards[stack])
+            raise AppError("Unknown card type " + cards[stack])
 
         logger.info(
             "Initial stack state: stack=%s type=%s state=%s",
@@ -1247,12 +941,10 @@ def cards_update(mode: int) -> None:
         elif cards[stack] == "rtd":
             get_rtd(stack, mode)
         else:
-            raise AppError("Uknown card type " + cards[stack])
+            raise AppError("Unknown card type " + cards[stack])
 
     # Sent LWT update
-    client.publish(
-        config["MQTT"]["TOPIC"] + "/tele/LWT", payload="Online", qos=0, retain=True
-    )
+    mqtt_publish("tele/LWT", payload="Online", qos=0, retain=True)
 
 
 def cards_unsubscribe() -> None:
@@ -1285,8 +977,8 @@ def cards_tele(mode: int) -> bool:
             elif cards[stack] == "megabas":
                 if tele_megabas(stack):
                     break
-        client.publish(
-            config["MQTT"]["TOPIC"] + "/tele/STATE",
+        mqtt_publish(
+            "tele/STATE",
             json.dumps(tele),
             int(config["MQTT"]["QOS"]),
         )
@@ -1299,6 +991,10 @@ def cards_tele(mode: int) -> bool:
 def cards_watchdog(mode: int) -> bool:
     global last_watchdog
 
+    # If watchdog is disabled, do nothing
+    if int(config["WATCHDOG"]["TIMEOUT"]) == 0:
+        return True
+
     now = int(time.time())
     for stack in cards.keys():
         if cards[stack] not in ["megaind", "megabas"]:
@@ -1307,65 +1003,81 @@ def cards_watchdog(mode: int) -> bool:
             logger.debug(f"Enabling watchdog for stack {stack} of type {cards[stack]}")
         elif mode == 2:
             logger.debug(f"Disabling watchdog for stack {stack} of type {cards[stack]}")
-        elif (
-            mode == 0 and last_watchdog + (int(config["WATCHDOG"]["TIMEOUT"]) / 3) < now
-        ):
-            logger.debug(f"Reseting watchdog for stack {stack} of type {cards[stack]}")
+        elif mode == 0:
+            if (
+                last_watchdog >= 0
+                and last_watchdog + (int(config["WATCHDOG"]["TIMEOUT"]) / 3) < now
+            ):
+                logger.debug(
+                    f"Resetting watchdog timer for stack {stack} of type {cards[stack]}"
+                )
+            else:
+                return True
         else:
             return False
-        last_watchdog = now
+
         if cards[stack] == "megaind":
-            watchdog_megaind(stack, mode)
-            logger.debug("Card watchdog set completed")
-            return True
+            if watchdog_megaind(stack, mode):
+                last_watchdog = now
+                logger.debug("Card watchdog set completed")
+                return True
         elif cards[stack] == "megabas":
-            watchdog_megabas(stack, mode)
-            logger.debug("Card watchdog set completed")
-            return True
-    return True
+            if watchdog_megabas(stack, mode):
+                last_watchdog = now
+                logger.debug("Card watchdog set completed")
+                return True
+    return False
 
 
 def check_heartbeat(mode: int) -> None:
     global last_heartbeat
+    global last_watchdog
+
+    # If heartbeat is disabled, do nothing
+    if int(config["HEARTBEAT"]["TIMEOUT"]) == 0:
+        return True
+
     now = int(time.time())
     if mode == 1:
         last_heartbeat = now
-        client.publish(
-            config["MQTT"]["TOPIC"] + "/" + config["HEARTBEAT"]["TOPIC_RESPONSE"],
+        mqtt_publish(
+            config["HEARTBEAT"]["TOPIC_RESPONSE"],
             str(now),
             int(config["MQTT"]["QOS"]),
         )
-    elif (
-        int(config["HEARTBEAT"]["TIMEOUT"]) > 0
-        and last_heartbeat >= 0
-        and now - last_heartbeat > int(config["HEARTBEAT"]["TIMEOUT"])
-    ):
-        for stack in cards.keys():
-            if cards[stack] == "megaind":
-                reset_megaind(stack)
-            elif cards[stack] == "megabas":
-                reset_megabas(stack)
-            elif cards[stack] == "8relind":
-                reset_8relind(stack)
-        last_heartbeat = -1
-        logger.error("Missing heartbeat, all cards outputs reseted!")
-        raise AppError("Missing heartbeat, all cards outputs reseted!")
+    elif mode == 0:
+        if (
+            int(config["HEARTBEAT"]["TIMEOUT"]) > 0
+            and last_heartbeat >= 0
+            and now - last_heartbeat > int(config["HEARTBEAT"]["TIMEOUT"])
+        ):
+            logger.error("Missing heartbeat, all cards outputs will be reset!")
+            # This is critical error, reset all outputs to default values to prevent possible damage of connected devices
+            # Disable hardware watchdog timer reset, so hardware reboot will be triggered if cards reset is not successful
+            last_watchdog_bak = last_watchdog
+            last_watchdog = -1
+            for stack in cards.keys():
+                if cards[stack] == "megaind":
+                    reset_megaind(stack)
+                elif cards[stack] == "megabas":
+                    reset_megabas(stack)
+                elif cards[stack] == "8relind":
+                    reset_8relind(stack)
+            # Restore watchdog timer resets
+            last_watchdog = last_watchdog_bak
+            # Prevent multiple resets until heartbeat is received again
+            last_heartbeat = -1
+            logger.error("Missing heartbeat, all cards outputs were reset!")
+            raise AppError("Missing heartbeat, all cards outputs were reset!")
+        else:
+            return True
+    else:
+        return False
 
 
 def get_uptime_seconds() -> int:
     # Support different uptime package APIs and fallback to /proc/uptime.
     try:
-        fn = getattr(uptime, "uptime", None)
-        if callable(fn):
-            return int(fn())
-
-        fn = getattr(uptime, "boottime", None)
-        if callable(fn):
-            boot = fn()
-            if isinstance(boot, datetime.datetime):
-                return int((datetime.datetime.now() - boot).total_seconds())
-            return int(time.time() - float(boot))
-
         with open("/proc/uptime", "r", encoding="utf-8") as f:
             return int(float(f.read().split()[0]))
     except Exception as error:
@@ -1440,8 +1152,8 @@ def mqtt_cleanup() -> None:
         if client.is_connected():
             cards_unsubscribe()
             # Sent LWT update
-            client.publish(
-                config["MQTT"]["TOPIC"] + "/tele/LWT",
+            mqtt_publish(
+                "tele/LWT",
                 payload="Offline",
                 qos=0,
                 retain=True,
@@ -1629,8 +1341,27 @@ def mqtt_on_message(client: mqtt.Client, userdata: Any, msg: mqtt.MQTTMessage) -
             )
 
 
-# Imain loop
+def mqtt_publish(topic: str, payload: str, qos: int = 0, retain: bool = False) -> None:
+
+    if client and client.is_connected():
+        try:
+            client.publish(
+                config["MQTT"]["TOPIC"] + "/" + topic,
+                payload=payload,
+                qos=qos,
+                retain=retain,
+            )
+        except Exception as error:
+            logger.error(f"Failed to publish MQTT message: {error}")
+            raise MqttError(f"Failed to publish MQTT message: {error}")
+    else:
+        logger.error("MQTT not connected!")
+        raise MqttError("MQTT not connected!")
+
+
+# Main loop
 last_heartbeat = int(time.time())
+last_watchdog = 0
 client = None
 restart = 0
 while True:
@@ -1638,21 +1369,23 @@ while True:
         # Init counters
         last_tele = 0
         last_watchdog = 0
+        # Arm hardware watchdog
+        cards_watchdog(1)
         # Heartbeat check
         check_heartbeat(0)
+        # Reset watchdog timer
+        cards_watchdog(0)
         # Create mqtt client
         if not client:
             # Init mqtt
             mqtt_init()
         # init cards inputs and subscribe for output topics
         cards_init()
-        # init watchdogs
-        cards_watchdog(1)
         # Run sending thread
         while True:
             cards_update(0)
-            cards_watchdog(0)
             check_heartbeat(0)
+            cards_watchdog(0)
             time.sleep(1)
     except BaseException as error:
         logger.error(f"An exception occurred: {type(error).__name__} – {error}")
@@ -1660,9 +1393,9 @@ while True:
             int(config["RUNTIME"]["MAX_ERROR"]) == 0
             or restart <= int(config["RUNTIME"]["MAX_ERROR"])
         ):
-            if type(error) == MqttError:
+            if type(error) is MqttError:
                 mqtt_cleanup()
-            elif type(error) == AppError:
+            elif type(error) is AppError:
                 pass
             restart += 1
             # Try to reconnect later
@@ -1676,6 +1409,6 @@ while True:
             sys.exit(0)
         else:
             # Exit with error
-            logger.error(f"Unknown exception, aborting application")
+            logger.error("Unknown exception, aborting application")
             logger.debug(f"Exception details: {traceback.format_exc()}")
             sys.exit(1)
