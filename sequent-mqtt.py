@@ -214,7 +214,7 @@ def get_megaind(stack: int, init: int) -> None:
         value = megaind.get0_10Out(stack, channel)
         if init or value != cache[stack]["response"]["0_10"][channel - 1]:
             mqtt_publish(
-                "megaind/" + str(stack) + "/response/0_10/" + str(channel),
+                "/megaind/" + str(stack) + "/response/0_10/" + str(channel),
                 payload=str(value),
             )
             cache[stack]["response"]["0_10"][channel - 1] = value
@@ -222,7 +222,7 @@ def get_megaind(stack: int, init: int) -> None:
         value = megaind.get4_20Out(stack, channel)
         if init or value != cache[stack]["response"]["4_20"][channel - 1]:
             mqtt_publish(
-                "megaind/" + str(stack) + "/response/4_20/" + str(channel),
+                "/megaind/" + str(stack) + "/response/4_20/" + str(channel),
                 payload=str(value),
             )
             cache[stack]["response"]["4_20"][channel - 1] = value
@@ -230,7 +230,7 @@ def get_megaind(stack: int, init: int) -> None:
         value = megaind.getOdPWM(stack, channel)
         if init or value != cache[stack]["response"]["pwm"][channel - 1]:
             mqtt_publish(
-                "megaind/" + str(stack) + "/response/pwm/" + str(channel),
+                "/megaind/" + str(stack) + "/response/pwm/" + str(channel),
                 payload=str(value),
             )
             cache[stack]["response"]["pwm"][channel - 1] = value
@@ -238,7 +238,7 @@ def get_megaind(stack: int, init: int) -> None:
         value = megaind.getLed(stack, channel)
         if init or value != cache[stack]["response"]["led"][channel - 1]:
             mqtt_publish(
-                "megaind/" + str(stack) + "/response/led/" + str(channel),
+                "/megaind/" + str(stack) + "/response/led/" + str(channel),
                 payload=str(value),
             )
             cache[stack]["response"]["led"][channel - 1] = value
@@ -246,7 +246,7 @@ def get_megaind(stack: int, init: int) -> None:
         value = megaind.getOptoRisingCountEnable(stack, channel)
         if init or value != cache[stack]["response"]["opto_edge"][channel - 1]:
             mqtt_publish(
-                "megaind/" + str(stack) + "/response/opto_edge/" + str(channel),
+                "/megaind/" + str(stack) + "/response/opto_edge/" + str(channel),
                 payload=str(value),
             )
             cache[stack]["response"]["opto_edge"][channel - 1] = value
@@ -254,7 +254,7 @@ def get_megaind(stack: int, init: int) -> None:
         value = 0
         if init or value != cache[stack]["response"]["opto_rst"][channel - 1]:
             mqtt_publish(
-                "megaind/" + str(stack) + "/response/opto_rst/" + str(channel),
+                "/megaind/" + str(stack) + "/response/opto_rst/" + str(channel),
                 payload=str(value),
             )
             cache[stack]["response"]["opto_rst"][channel - 1] = value
@@ -262,7 +262,7 @@ def get_megaind(stack: int, init: int) -> None:
         value = round(megaind.get0_10In(stack, channel), 2)
         if init or value != cache[stack]["input"]["0_10"][channel - 1]:
             mqtt_publish(
-                "megaind/" + str(stack) + "/input/0_10/" + str(channel),
+                "/megaind/" + str(stack) + "/input/0_10/" + str(channel),
                 payload=str(value),
             )
             cache[stack]["input"]["0_10"][channel - 1] = value
@@ -270,7 +270,7 @@ def get_megaind(stack: int, init: int) -> None:
         value = round(megaind.getpm10In(stack, channel), 2)
         if init or value != cache[stack]["input"]["pm0_10"][channel - 1]:
             mqtt_publish(
-                "megaind/" + str(stack) + "/input/pm0_10/" + str(channel),
+                "/megaind/" + str(stack) + "/input/pm0_10/" + str(channel),
                 payload=str(value),
             )
             cache[stack]["input"]["pm0_10"][channel - 1] = value
@@ -278,7 +278,7 @@ def get_megaind(stack: int, init: int) -> None:
         value = megaind.get4_20In(stack, channel)
         if init or value != cache[stack]["input"]["4_20"][channel - 1]:
             mqtt_publish(
-                "megaind/" + str(stack) + "/input/4_20/" + str(channel),
+                "/megaind/" + str(stack) + "/input/4_20/" + str(channel),
                 payload=str(value),
             )
             cache[stack]["input"]["4_20"][channel - 1] = value
@@ -286,7 +286,7 @@ def get_megaind(stack: int, init: int) -> None:
         value = megaind.getOptoCh(stack, channel)
         if init or value != cache[stack]["input"]["opto"][channel - 1]:
             mqtt_publish(
-                "megaind/" + str(stack) + "/input/opto/" + str(channel),
+                "/megaind/" + str(stack) + "/input/opto/" + str(channel),
                 payload=str(value),
             )
             cache[stack]["input"]["opto"][channel - 1] = value
@@ -294,7 +294,7 @@ def get_megaind(stack: int, init: int) -> None:
         value = megaind.getOptoCount(stack, channel)
         if init or value != cache[stack]["input"]["opto_count"][channel - 1]:
             mqtt_publish(
-                "megaind/" + str(stack) + "/input/opto_count/" + str(channel),
+                "/megaind/" + str(stack) + "/input/opto_count/" + str(channel),
                 payload=str(value),
             )
             cache[stack]["input"]["opto_count"][channel - 1] = value
@@ -311,7 +311,7 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
         megaind.set0_10Out(stack, channel, value)
         value = megaind.get0_10Out(stack, channel)
         mqtt_publish(
-            "megaind/" + str(stack) + "/response/0_10/" + str(channel),
+            "/megaind/" + str(stack) + "/response/0_10/" + str(channel),
             payload=str(value),
         )
         cache[stack]["response"]["0_10"][channel - 1] = value
@@ -325,7 +325,7 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
         megaind.set4_20Out(stack, channel, value)
         value = megaind.get4_20Out(stack, channel)
         mqtt_publish(
-            "megaind/" + str(stack) + "/response/4_20/" + str(channel),
+            "/megaind/" + str(stack) + "/response/4_20/" + str(channel),
             payload=str(value),
         )
         cache[stack]["response"]["4_20"][channel - 1] = value
@@ -339,7 +339,7 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
         megaind.setOdPWM(stack, channel, value)
         value = megaind.getOdPWM(stack, channel)
         mqtt_publish(
-            "megaind/" + str(stack) + "/response/pwm/" + str(channel),
+            "/megaind/" + str(stack) + "/response/pwm/" + str(channel),
             payload=str(value),
         )
         cache[stack]["response"]["pwm"][channel - 1] = value
@@ -353,7 +353,7 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
         megaind.setLed(stack, channel, value)
         value = megaind.getLed(stack, channel)
         mqtt_publish(
-            "megaind/" + str(stack) + "/response/led/" + str(channel),
+            "/megaind/" + str(stack) + "/response/led/" + str(channel),
             payload=str(value),
         )
         cache[stack]["response"]["led"][channel - 1] = value
@@ -372,7 +372,7 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
         fce = megaind.getOptoFallingCountEnable(stack, channel)
         value = (rce << 0) | (fce << 1)
         mqtt_publish(
-            "megaind/" + str(stack) + "/response/opto_edge/" + str(channel),
+            "/megaind/" + str(stack) + "/response/opto_edge/" + str(channel),
             payload=str(value),
         )
         cache[stack]["response"]["opto_edge"][channel - 1] = value
@@ -387,15 +387,15 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
             megaind.rstOptoCount(stack, channel)
             value = megaind.getOptoCount(stack, channel)
             mqtt_publish(
-                "megaind/" + str(stack) + "/response/opto_rst/" + str(channel),
+                "/megaind/" + str(stack) + "/response/opto_rst/" + str(channel),
                 payload=1,
             )
             mqtt_publish(
-                "megaind/" + str(stack) + "/input/opto_count/" + str(channel),
+                "/megaind/" + str(stack) + "/input/opto_count/" + str(channel),
                 payload=str(value),
             )
         mqtt_publish(
-            "megaind/" + str(stack) + "/response/opto_rst/" + str(channel),
+            "/megaind/" + str(stack) + "/response/opto_rst/" + str(channel),
             payload=0,
         )
         cache[stack]["input"]["opto_count"][channel - 1] = value
@@ -472,7 +472,7 @@ def get_megabas(stack: int, init: int) -> None:
         value = megabas.getUOut(stack, channel)
         if init or value != cache[stack]["response"]["0_10"][channel - 1]:
             mqtt_publish(
-                "megabas/" + str(stack) + "/response/0_10/" + str(channel),
+                "/megabas/" + str(stack) + "/response/0_10/" + str(channel),
                 payload=str(value),
             )
             cache[stack]["response"]["0_10"][channel - 1] = value
@@ -483,7 +483,7 @@ def get_megabas(stack: int, init: int) -> None:
             value = 0
         if init or value != cache[stack]["response"]["triac"][channel - 1]:
             mqtt_publish(
-                "megabas/" + str(stack) + "/response/triac/" + str(channel),
+                "/megabas/" + str(stack) + "/response/triac/" + str(channel),
                 payload=str(value),
             )
             cache[stack]["response"]["triac"][channel - 1] = value
@@ -492,7 +492,7 @@ def get_megabas(stack: int, init: int) -> None:
         value = round(megabas.getUIn(stack, channel), 2)
         if init or value != cache[stack]["input"]["0_10"][channel - 1]:
             mqtt_publish(
-                "megabas/" + str(stack) + "/input/0_10/" + str(channel),
+                "/megabas/" + str(stack) + "/input/0_10/" + str(channel),
                 payload=str(value),
             )
             cache[stack]["input"]["0_10"][channel - 1] = value
@@ -500,7 +500,7 @@ def get_megabas(stack: int, init: int) -> None:
         value = round(megabas.getRIn1K(stack, channel), 2)
         if init or value != cache[stack]["input"]["1k"][channel - 1]:
             mqtt_publish(
-                "megabas/" + str(stack) + "/input/1k/" + str(channel),
+                "/megabas/" + str(stack) + "/input/1k/" + str(channel),
                 payload=str(value),
             )
             cache[stack]["input"]["1k"][channel - 1] = value
@@ -508,7 +508,7 @@ def get_megabas(stack: int, init: int) -> None:
         value = round(megabas.getRIn10K(stack, channel), 2)
         if init or value != cache[stack]["input"]["10k"][channel - 1]:
             mqtt_publish(
-                "megabas/" + str(stack) + "/input/10k/" + str(channel),
+                "/megabas/" + str(stack) + "/input/10k/" + str(channel),
                 payload=str(value),
             )
             cache[stack]["input"]["10k"][channel - 1] = value
@@ -516,7 +516,7 @@ def get_megabas(stack: int, init: int) -> None:
         value = megabas.getContactCh(stack, channel)
         if init or value != cache[stack]["input"]["cont"][channel - 1]:
             mqtt_publish(
-                "megabas/" + str(stack) + "/input/cont/" + str(channel),
+                "/megabas/" + str(stack) + "/input/cont/" + str(channel),
                 str(value),
             )
             cache[stack]["input"]["cont"][channel - 1] = value
@@ -524,7 +524,7 @@ def get_megabas(stack: int, init: int) -> None:
         value = megabas.getContactCounter(stack, channel)
         if init or value != cache[stack]["input"]["cont_count"][channel - 1]:
             mqtt_publish(
-                "megabas/" + str(stack) + "/input/cont_count/" + str(channel),
+                "/megabas/" + str(stack) + "/input/cont_count/" + str(channel),
                 payload=str(value),
             )
             cache[stack]["input"]["cont_count"][channel - 1] = value
@@ -532,7 +532,7 @@ def get_megabas(stack: int, init: int) -> None:
         value = megabas.getContactCountEdge(stack, channel)
         if init or value != cache[stack]["response"]["cont_edge"][channel - 1]:
             mqtt_publish(
-                "megabas/" + str(stack) + "/response/cont_edge/" + str(channel),
+                "/megabas/" + str(stack) + "/response/cont_edge/" + str(channel),
                 payload=str(value),
             )
             cache[stack]["response"]["cont_edge"][channel - 1] = value
@@ -551,7 +551,7 @@ def set_megabas(stack: int, output: str, channel: int, value: int) -> None:
         megabas.setUOut(stack, channel, value)
         value = megabas.getUOut(stack, channel)
         mqtt_publish(
-            "megabas/" + str(stack) + "/response/0_10/" + str(channel),
+            "/megabas/" + str(stack) + "/response/0_10/" + str(channel),
             payload=str(value),
         )
         cache[stack]["response"]["0_10"][channel - 1] = value
@@ -569,7 +569,7 @@ def set_megabas(stack: int, output: str, channel: int, value: int) -> None:
         else:
             value = 0
         mqtt_publish(
-            "megabas/" + str(stack) + "/response/triac/" + str(channel),
+            "/megabas/" + str(stack) + "/response/triac/" + str(channel),
             payload=str(value),
         )
         cache[stack]["response"]["triac"][channel - 1] = value
@@ -583,7 +583,7 @@ def set_megabas(stack: int, output: str, channel: int, value: int) -> None:
         megabas.setContactCountEdge(stack, channel, value)
         value = megabas.getContactCountEdge(stack, channel)
         mqtt_publish(
-            "megabas/" + str(stack) + "/response/cont_edge/" + str(channel),
+            "/megabas/" + str(stack) + "/response/cont_edge/" + str(channel),
             payload=str(value),
         )
         cache[stack]["response"]["cont_edge"][channel - 1] = value
@@ -659,7 +659,7 @@ def get_8relind(stack: int, init: int) -> None:
         value = lib8relind.get(stack, channel)
         if init or value != cache[stack]["response"]["relay"][channel - 1]:
             mqtt_publish(
-                "8relind/" + str(stack) + "/response/relay/" + str(channel),
+                "/8relind/" + str(stack) + "/response/relay/" + str(channel),
                 payload=str(value),
             )
             cache[stack]["response"]["relay"][channel - 1] = value
@@ -676,7 +676,7 @@ def set_8relind(stack: int, output: str, channel: int, value: int) -> None:
         lib8relind.set(stack, channel, value)
         value = lib8relind.get(stack, channel)
         mqtt_publish(
-            "8relind/" + str(stack) + "/response/relay/" + str(channel),
+            "/8relind/" + str(stack) + "/response/relay/" + str(channel),
             payload=str(value),
         )
         cache[stack]["response"]["relay"][channel - 1] = value
@@ -708,7 +708,7 @@ def get_16inpind(stack: int, init: int) -> None:
         value = (rce << 0) | (fce << 1)
         if init or value != cache[stack]["response"]["opto_edge"][channel - 1]:
             mqtt_publish(
-                "16inpind/" + str(stack) + "/response/opto_edge/" + str(channel),
+                "/16inpind/" + str(stack) + "/response/opto_edge/" + str(channel),
                 payload=str(value),
             )
             cache[stack]["response"]["opto_edge"][channel - 1] = value
@@ -716,7 +716,7 @@ def get_16inpind(stack: int, init: int) -> None:
         value = 0
         if init or value != cache[stack]["response"]["opto_rst"][channel - 1]:
             mqtt_publish(
-                "16inpind/" + str(stack) + "/response/opto_rst/" + str(channel),
+                "/16inpind/" + str(stack) + "/response/opto_rst/" + str(channel),
                 payload=str(value),
             )
             cache[stack]["response"]["opto_rst"][channel - 1] = value
@@ -724,7 +724,7 @@ def get_16inpind(stack: int, init: int) -> None:
         value = lib16inpind.getOpto(stack, channel)
         if init or value != cache[stack]["input"]["opto"][channel - 1]:
             mqtt_publish(
-                "16inpind/" + str(stack) + "/input/opto/" + str(channel),
+                "/16inpind/" + str(stack) + "/input/opto/" + str(channel),
                 payload=str(value),
             )
             cache[stack]["input"]["opto"][channel - 1] = value
@@ -732,7 +732,7 @@ def get_16inpind(stack: int, init: int) -> None:
         value = lib16inpind.getOptoCount(stack, channel)
         if init or value != cache[stack]["input"]["opto_count"][channel - 1]:
             mqtt_publish(
-                "16inpind/" + str(stack) + "/input/opto_count/" + str(channel),
+                "/16inpind/" + str(stack) + "/input/opto_count/" + str(channel),
                 payload=str(value),
             )
             cache[stack]["input"]["opto_count"][channel - 1] = value
@@ -755,7 +755,7 @@ def set_16inpind(stack: int, output: str, channel: int, value: int) -> None:
         rce = lib16inpind.getOptoEdge(stack, channel, 1)
         value = (rce << 0) | (fce << 1)
         mqtt_publish(
-            "16inpind/" + str(stack) + "/response/opto_edge/" + str(channel),
+            "/16inpind/" + str(stack) + "/response/opto_edge/" + str(channel),
             payload=str(value),
         )
         cache[stack]["response"]["opto_edge"][channel - 1] = value
@@ -770,15 +770,15 @@ def set_16inpind(stack: int, output: str, channel: int, value: int) -> None:
             lib16inpind.resetOptoCount(stack, channel, 0, value)
             value = lib16inpind.getOptoCount(stack, channel, 0)
             mqtt_publish(
-                "16inpind/" + str(stack) + "/response/opto_rst/" + str(channel),
+                "/16inpind/" + str(stack) + "/response/opto_rst/" + str(channel),
                 payload="1",
             )
             mqtt_publish(
-                "16inpind/" + str(stack) + "/input/opto_count/" + str(channel),
+                "/16inpind/" + str(stack) + "/input/opto_count/" + str(channel),
                 payload=str(value),
             )
         mqtt_publish(
-            "16inpind/" + str(stack) + "/response/opto_rst/" + str(channel),
+            "/16inpind/" + str(stack) + "/response/opto_rst/" + str(channel),
             str(value),
         )
         cache[stack]["response"]["opto_rst"][channel - 1] = value
@@ -800,7 +800,7 @@ def get_8inputs(stack: int, init: int) -> None:
         value = lib8inputs.get_opto(stack, channel)
         if init or value != cache[stack]["input"]["opto"][channel - 1]:
             mqtt_publish(
-                "8inputs/" + str(stack) + "/input/opto/" + str(channel),
+                "/8inputs/" + str(stack) + "/input/opto/" + str(channel),
                 payload=str(value),
             )
             cache[stack]["input"]["opto"][channel - 1] = value
@@ -811,7 +811,7 @@ def get_rtd(stack: int, init: int) -> None:
         value = librtd.get(stack, channel)
         if init or value != cache[stack]["input"]["rtd"][channel - 1]:
             mqtt_publish(
-                "rtd/" + str(stack) + "/input/rtd/" + str(channel),
+                "/rtd/" + str(stack) + "/input/rtd/" + str(channel),
                 payload=str(value),
             )
             cache[stack]["input"]["rtd"][channel - 1] = value
@@ -878,7 +878,7 @@ def cards_tele(mode: int) -> bool:
                 if tele_megabas(stack):
                     break
         mqtt_publish(
-            "tele/STATE",
+            "/tele/STATE",
             payload=json.dumps(tele),
         )
         last_tele = now
@@ -909,7 +909,7 @@ def cards_tele(mode: int) -> bool:
             raise AppError("Unknown card type " + cards[stack])
 
     # Sent LWT update
-    mqtt_publish("tele/LWT", payload="Online", retain=True)
+    mqtt_publish("/tele/LWT", payload="Online", retain=True)
 
 
 def cards_watchdog(mode: int) -> bool:
@@ -965,7 +965,7 @@ def check_heartbeat(mode: int) -> None:
     if mode == 1:
         last_heartbeat = now
         mqtt_publish(
-            config["HEARTBEAT"]["TOPIC_RESPONSE"],
+            "/" + config["HEARTBEAT"]["TOPIC_RESPONSE"],
             payload=str(now),
         )
     elif mode == 0:
@@ -1085,14 +1085,19 @@ def mqtt_publish(
 
     if client and client.is_connected():
         try:
+            if not topic.startswith("/"):
+                topic = "/" + topic
+            logger.debug(f"Publishing MQTT message to topic {topic} with payload {payload}")
             result = client.publish(
-                config["MQTT"]["TOPIC"] + "/" + topic,
+                config["MQTT"]["TOPIC"] + topic,
                 payload=payload,
                 qos=qos,
                 retain=retain,
             )
             if result.rc != mqtt.MQTT_ERR_SUCCESS:
-                raise MqttError(f"MQTT publish failed with code {result.rc} on topic {topic}")
+                raise MqttError(
+                    f"MQTT publish failed with code {result.rc} on topic {topic}"
+                )
         except Exception as error:
             logger.error(f"Failed to publish MQTT message: {error}")
             raise MqttError(f"Failed to publish MQTT message: {error}")
