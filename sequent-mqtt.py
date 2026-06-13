@@ -215,8 +215,7 @@ def get_megaind(stack: int, init: int) -> None:
         if init or value != cache[stack]["response"]["0_10"][channel - 1]:
             mqtt_publish(
                 "megaind/" + str(stack) + "/response/0_10/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
             cache[stack]["response"]["0_10"][channel - 1] = value
 
@@ -224,8 +223,7 @@ def get_megaind(stack: int, init: int) -> None:
         if init or value != cache[stack]["response"]["4_20"][channel - 1]:
             mqtt_publish(
                 "megaind/" + str(stack) + "/response/4_20/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
             cache[stack]["response"]["4_20"][channel - 1] = value
 
@@ -233,8 +231,7 @@ def get_megaind(stack: int, init: int) -> None:
         if init or value != cache[stack]["response"]["pwm"][channel - 1]:
             mqtt_publish(
                 "megaind/" + str(stack) + "/response/pwm/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
             cache[stack]["response"]["pwm"][channel - 1] = value
 
@@ -242,8 +239,7 @@ def get_megaind(stack: int, init: int) -> None:
         if init or value != cache[stack]["response"]["led"][channel - 1]:
             mqtt_publish(
                 "megaind/" + str(stack) + "/response/led/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
             cache[stack]["response"]["led"][channel - 1] = value
 
@@ -251,8 +247,7 @@ def get_megaind(stack: int, init: int) -> None:
         if init or value != cache[stack]["response"]["opto_edge"][channel - 1]:
             mqtt_publish(
                 "megaind/" + str(stack) + "/response/opto_edge/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
             cache[stack]["response"]["opto_edge"][channel - 1] = value
 
@@ -260,8 +255,7 @@ def get_megaind(stack: int, init: int) -> None:
         if init or value != cache[stack]["response"]["opto_rst"][channel - 1]:
             mqtt_publish(
                 "megaind/" + str(stack) + "/response/opto_rst/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
             cache[stack]["response"]["opto_rst"][channel - 1] = value
 
@@ -269,8 +263,7 @@ def get_megaind(stack: int, init: int) -> None:
         if init or value != cache[stack]["input"]["0_10"][channel - 1]:
             mqtt_publish(
                 "megaind/" + str(stack) + "/input/0_10/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
             cache[stack]["input"]["0_10"][channel - 1] = value
 
@@ -278,8 +271,7 @@ def get_megaind(stack: int, init: int) -> None:
         if init or value != cache[stack]["input"]["pm0_10"][channel - 1]:
             mqtt_publish(
                 "megaind/" + str(stack) + "/input/pm0_10/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
             cache[stack]["input"]["pm0_10"][channel - 1] = value
 
@@ -287,8 +279,7 @@ def get_megaind(stack: int, init: int) -> None:
         if init or value != cache[stack]["input"]["4_20"][channel - 1]:
             mqtt_publish(
                 "megaind/" + str(stack) + "/input/4_20/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
             cache[stack]["input"]["4_20"][channel - 1] = value
 
@@ -296,8 +287,7 @@ def get_megaind(stack: int, init: int) -> None:
         if init or value != cache[stack]["input"]["opto"][channel - 1]:
             mqtt_publish(
                 "megaind/" + str(stack) + "/input/opto/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
             cache[stack]["input"]["opto"][channel - 1] = value
 
@@ -305,8 +295,7 @@ def get_megaind(stack: int, init: int) -> None:
         if init or value != cache[stack]["input"]["opto_count"][channel - 1]:
             mqtt_publish(
                 "megaind/" + str(stack) + "/input/opto_count/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
             cache[stack]["input"]["opto_count"][channel - 1] = value
 
@@ -323,8 +312,7 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
         value = megaind.get0_10Out(stack, channel)
         mqtt_publish(
             "megaind/" + str(stack) + "/response/0_10/" + str(channel),
-            str(value),
-            int(config["MQTT"]["QOS"]),
+            payload=str(value),
         )
         cache[stack]["response"]["0_10"][channel - 1] = value
     elif output == "4_20" and 1 <= channel <= 4 and 4 <= value <= 20:
@@ -338,8 +326,7 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
         value = megaind.get4_20Out(stack, channel)
         mqtt_publish(
             "megaind/" + str(stack) + "/response/4_20/" + str(channel),
-            str(value),
-            int(config["MQTT"]["QOS"]),
+            payload=str(value),
         )
         cache[stack]["response"]["4_20"][channel - 1] = value
     elif output == "pwm" and 1 <= channel <= 4 and 0 <= value <= 100:
@@ -353,8 +340,7 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
         value = megaind.getOdPWM(stack, channel)
         mqtt_publish(
             "megaind/" + str(stack) + "/response/pwm/" + str(channel),
-            str(value),
-            int(config["MQTT"]["QOS"]),
+            payload=str(value),
         )
         cache[stack]["response"]["pwm"][channel - 1] = value
     elif output == "led" and 1 <= channel <= 4 and value in [0, 1]:
@@ -368,8 +354,7 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
         value = megaind.getLed(stack, channel)
         mqtt_publish(
             "megaind/" + str(stack) + "/response/led/" + str(channel),
-            str(value),
-            int(config["MQTT"]["QOS"]),
+            payload=str(value),
         )
         cache[stack]["response"]["led"][channel - 1] = value
     elif output == "opto_edge" and 1 <= channel <= 4 and value in [0, 1, 2, 3]:
@@ -388,8 +373,7 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
         value = (rce << 0) | (fce << 1)
         mqtt_publish(
             "megaind/" + str(stack) + "/response/opto_edge/" + str(channel),
-            str(value),
-            int(config["MQTT"]["QOS"]),
+            payload=str(value),
         )
         cache[stack]["response"]["opto_edge"][channel - 1] = value
     elif output == "opto_rst" and 1 <= channel <= 4 and value in [0, 1]:
@@ -404,18 +388,15 @@ def set_megaind(stack: int, output: str, channel: int, value: int) -> None:
             value = megaind.getOptoCount(stack, channel)
             mqtt_publish(
                 "megaind/" + str(stack) + "/response/opto_rst/" + str(channel),
-                1,
-                int(config["MQTT"]["QOS"]),
+                payload=1,
             )
             mqtt_publish(
                 "megaind/" + str(stack) + "/input/opto_count/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
         mqtt_publish(
             "megaind/" + str(stack) + "/response/opto_rst/" + str(channel),
-            0,
-            int(config["MQTT"]["QOS"]),
+            payload=0,
         )
         cache[stack]["input"]["opto_count"][channel - 1] = value
     else:
@@ -492,8 +473,7 @@ def get_megabas(stack: int, init: int) -> None:
         if init or value != cache[stack]["response"]["0_10"][channel - 1]:
             mqtt_publish(
                 "megabas/" + str(stack) + "/response/0_10/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
             cache[stack]["response"]["0_10"][channel - 1] = value
 
@@ -504,8 +484,7 @@ def get_megabas(stack: int, init: int) -> None:
         if init or value != cache[stack]["response"]["triac"][channel - 1]:
             mqtt_publish(
                 "megabas/" + str(stack) + "/response/triac/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
             cache[stack]["response"]["triac"][channel - 1] = value
 
@@ -514,8 +493,7 @@ def get_megabas(stack: int, init: int) -> None:
         if init or value != cache[stack]["input"]["0_10"][channel - 1]:
             mqtt_publish(
                 "megabas/" + str(stack) + "/input/0_10/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
             cache[stack]["input"]["0_10"][channel - 1] = value
 
@@ -523,8 +501,7 @@ def get_megabas(stack: int, init: int) -> None:
         if init or value != cache[stack]["input"]["1k"][channel - 1]:
             mqtt_publish(
                 "megabas/" + str(stack) + "/input/1k/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
             cache[stack]["input"]["1k"][channel - 1] = value
 
@@ -532,8 +509,7 @@ def get_megabas(stack: int, init: int) -> None:
         if init or value != cache[stack]["input"]["10k"][channel - 1]:
             mqtt_publish(
                 "megabas/" + str(stack) + "/input/10k/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
             cache[stack]["input"]["10k"][channel - 1] = value
 
@@ -542,7 +518,6 @@ def get_megabas(stack: int, init: int) -> None:
             mqtt_publish(
                 "megabas/" + str(stack) + "/input/cont/" + str(channel),
                 str(value),
-                int(config["MQTT"]["QOS"]),
             )
             cache[stack]["input"]["cont"][channel - 1] = value
 
@@ -550,8 +525,7 @@ def get_megabas(stack: int, init: int) -> None:
         if init or value != cache[stack]["input"]["cont_count"][channel - 1]:
             mqtt_publish(
                 "megabas/" + str(stack) + "/input/cont_count/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
             cache[stack]["input"]["cont_count"][channel - 1] = value
 
@@ -559,8 +533,7 @@ def get_megabas(stack: int, init: int) -> None:
         if init or value != cache[stack]["response"]["cont_edge"][channel - 1]:
             mqtt_publish(
                 "megabas/" + str(stack) + "/response/cont_edge/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
             cache[stack]["response"]["cont_edge"][channel - 1] = value
 
@@ -579,8 +552,7 @@ def set_megabas(stack: int, output: str, channel: int, value: int) -> None:
         value = megabas.getUOut(stack, channel)
         mqtt_publish(
             "megabas/" + str(stack) + "/response/0_10/" + str(channel),
-            str(value),
-            int(config["MQTT"]["QOS"]),
+            payload=str(value),
         )
         cache[stack]["response"]["0_10"][channel - 1] = value
     elif output == "triac" and 1 <= channel <= 4 and value in [0, 1]:
@@ -598,8 +570,7 @@ def set_megabas(stack: int, output: str, channel: int, value: int) -> None:
             value = 0
         mqtt_publish(
             "megabas/" + str(stack) + "/response/triac/" + str(channel),
-            str(value),
-            int(config["MQTT"]["QOS"]),
+            payload=str(value),
         )
         cache[stack]["response"]["triac"][channel - 1] = value
     elif output == "cont_edge" and 1 <= channel <= 8 and value in [0, 1, 2, 3]:
@@ -613,8 +584,7 @@ def set_megabas(stack: int, output: str, channel: int, value: int) -> None:
         value = megabas.getContactCountEdge(stack, channel)
         mqtt_publish(
             "megabas/" + str(stack) + "/response/cont_edge/" + str(channel),
-            str(value),
-            int(config["MQTT"]["QOS"]),
+            payload=str(value),
         )
         cache[stack]["response"]["cont_edge"][channel - 1] = value
     else:
@@ -690,8 +660,7 @@ def get_8relind(stack: int, init: int) -> None:
         if init or value != cache[stack]["response"]["relay"][channel - 1]:
             mqtt_publish(
                 "8relind/" + str(stack) + "/response/relay/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
             cache[stack]["response"]["relay"][channel - 1] = value
 
@@ -708,8 +677,7 @@ def set_8relind(stack: int, output: str, channel: int, value: int) -> None:
         value = lib8relind.get(stack, channel)
         mqtt_publish(
             "8relind/" + str(stack) + "/response/relay/" + str(channel),
-            str(value),
-            int(config["MQTT"]["QOS"]),
+            payload=str(value),
         )
         cache[stack]["response"]["relay"][channel - 1] = value
     else:
@@ -741,8 +709,7 @@ def get_16inpind(stack: int, init: int) -> None:
         if init or value != cache[stack]["response"]["opto_edge"][channel - 1]:
             mqtt_publish(
                 "16inpind/" + str(stack) + "/response/opto_edge/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
             cache[stack]["response"]["opto_edge"][channel - 1] = value
 
@@ -750,8 +717,7 @@ def get_16inpind(stack: int, init: int) -> None:
         if init or value != cache[stack]["response"]["opto_rst"][channel - 1]:
             mqtt_publish(
                 "16inpind/" + str(stack) + "/response/opto_rst/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
             cache[stack]["response"]["opto_rst"][channel - 1] = value
 
@@ -759,8 +725,7 @@ def get_16inpind(stack: int, init: int) -> None:
         if init or value != cache[stack]["input"]["opto"][channel - 1]:
             mqtt_publish(
                 "16inpind/" + str(stack) + "/input/opto/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
             cache[stack]["input"]["opto"][channel - 1] = value
 
@@ -768,8 +733,7 @@ def get_16inpind(stack: int, init: int) -> None:
         if init or value != cache[stack]["input"]["opto_count"][channel - 1]:
             mqtt_publish(
                 "16inpind/" + str(stack) + "/input/opto_count/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
             cache[stack]["input"]["opto_count"][channel - 1] = value
 
@@ -792,8 +756,7 @@ def set_16inpind(stack: int, output: str, channel: int, value: int) -> None:
         value = (rce << 0) | (fce << 1)
         mqtt_publish(
             "16inpind/" + str(stack) + "/response/opto_edge/" + str(channel),
-            str(value),
-            int(config["MQTT"]["QOS"]),
+            payload=str(value),
         )
         cache[stack]["response"]["opto_edge"][channel - 1] = value
     elif output == "opto_rst" and 1 <= channel <= 16 and value in [0, 1]:
@@ -808,18 +771,15 @@ def set_16inpind(stack: int, output: str, channel: int, value: int) -> None:
             value = lib16inpind.getOptoCount(stack, channel, 0)
             mqtt_publish(
                 "16inpind/" + str(stack) + "/response/opto_rst/" + str(channel),
-                "1",
-                int(config["MQTT"]["QOS"]),
+                payload="1",
             )
             mqtt_publish(
                 "16inpind/" + str(stack) + "/input/opto_count/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
         mqtt_publish(
             "16inpind/" + str(stack) + "/response/opto_rst/" + str(channel),
             str(value),
-            int(config["MQTT"]["QOS"]),
         )
         cache[stack]["response"]["opto_rst"][channel - 1] = value
     else:
@@ -841,8 +801,7 @@ def get_8inputs(stack: int, init: int) -> None:
         if init or value != cache[stack]["input"]["opto"][channel - 1]:
             mqtt_publish(
                 "8inputs/" + str(stack) + "/input/opto/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
             cache[stack]["input"]["opto"][channel - 1] = value
 
@@ -853,17 +812,15 @@ def get_rtd(stack: int, init: int) -> None:
         if init or value != cache[stack]["input"]["rtd"][channel - 1]:
             mqtt_publish(
                 "rtd/" + str(stack) + "/input/rtd/" + str(channel),
-                str(value),
-                int(config["MQTT"]["QOS"]),
+                payload=str(value),
             )
             cache[stack]["input"]["rtd"][channel - 1] = value
 
 
-def cards_init() -> None:
+def cards_subscribe():
     client.subscribe(
         config["MQTT"]["TOPIC"] + "/tele/cmnd/+", int(config["MQTT"]["QOS"])
     )
-    cards_tele(1)
     for stack in cards.keys():
         # Subscribe for output commands only for cards with response topics
         if "response" in cache[stack]:
@@ -880,44 +837,52 @@ def cards_init() -> None:
                 int(config["MQTT"]["QOS"]),
             )
 
-        # Publish initial card state
-        if cards[stack] == "megaind":
-            get_megaind(stack, 1)
-        elif cards[stack] == "megabas":
-            get_megabas(stack, 1)
-        elif cards[stack] == "8relind":
-            get_8relind(stack, 1)
-        elif cards[stack] == "8inputs":
-            get_8inputs(stack, 1)
-        elif cards[stack] == "16inpind":
-            get_16inpind(stack, 1)
-        elif cards[stack] == "rtd":
-            get_rtd(stack, 1)
-        else:
-            raise AppError("Unknown card type " + cards[stack])
-
-        logger.info(
-            "Initial stack state: stack=%s type=%s state=%s",
-            stack,
-            cards[stack],
-            json.dumps(cache[stack], sort_keys=True),
-        )
-
     # Subscribe for heartbeat challenge messages
     client.subscribe(
-        config["MQTT"]["TOPIC"] + "/" + config["HEARTBEAT"]["TOPIC_CHALLENGE"]
+        config["MQTT"]["TOPIC"] + "/" + config["HEARTBEAT"]["TOPIC_CHALLENGE"], int(config["MQTT"]["QOS"])
     )
 
     # Subscribe for Home Assistant birth messages
     if config["MQTT"]["BIRTH_TOPIC"]:
-        client.subscribe(config["MQTT"]["BIRTH_TOPIC"])
+        client.subscribe(config["MQTT"]["BIRTH_TOPIC"], int(config["MQTT"]["QOS"]))
 
 
-def cards_update(mode: int) -> None:
-    if cards_tele(mode):
+def cards_unsubscribe() -> None:
+    client.unsubscribe(
+        config["MQTT"]["TOPIC"] + "/tele/cmnd/+", int(config["MQTT"]["QOS"])
+    )
+    client.unsubscribe(
+        config["MQTT"]["TOPIC"] + "/" + config["HEARTBEAT"]["TOPIC_CHALLENGE"], int(config["MQTT"]["QOS"])
+    )
+    # Unsubscribe from Home Assistant birth messages
+    if config["MQTT"]["BIRTH_TOPIC"]:
+        client.unsubscribe(config["MQTT"]["BIRTH_TOPIC"], int(config["MQTT"]["QOS"]))
+
+    for stack in cards.keys():
+        client.unsubscribe(
+            config["MQTT"]["TOPIC"] + "/" + cards[stack] + "/#",
+            int(config["MQTT"]["QOS"]),
+        )
+
+
+def cards_tele(mode: int) -> bool:
+    global last_tele
+    now = time.time()
+    if now - last_tele > int(config["RUNTIME"]["TELE_INTERVAL"]) or mode == 1:
+        get_time()
+        for stack in cards.keys():
+            if cards[stack] == "megaind":
+                if tele_megaind(stack):
+                    break
+            elif cards[stack] == "megabas":
+                if tele_megabas(stack):
+                    break
+        mqtt_publish(
+            "tele/STATE",
+            payload=json.dumps(tele),
+        )
+        last_tele = now
         mode = 1
-    else:
-        mode = 0
 
     for stack in cards.keys():
         if client and client.is_connected():
@@ -944,48 +909,7 @@ def cards_update(mode: int) -> None:
             raise AppError("Unknown card type " + cards[stack])
 
     # Sent LWT update
-    mqtt_publish("tele/LWT", payload="Online", qos=0, retain=True)
-
-
-def cards_unsubscribe() -> None:
-    client.unsubscribe(
-        config["MQTT"]["TOPIC"] + "/tele/cmnd/+", int(config["MQTT"]["QOS"])
-    )
-    client.unsubscribe(
-        config["MQTT"]["TOPIC"] + "/" + config["HEARTBEAT"]["TOPIC_CHALLENGE"]
-    )
-    # Unsubscribe from Home Assistant birth messages
-    if config["MQTT"]["BIRTH_TOPIC"]:
-        client.unsubscribe(config["MQTT"]["BIRTH_TOPIC"])
-
-    for stack in cards.keys():
-        client.unsubscribe(
-            config["MQTT"]["TOPIC"] + "/" + cards[stack] + "/#",
-            int(config["MQTT"]["QOS"]),
-        )
-
-
-def cards_tele(mode: int) -> bool:
-    global last_tele
-    now = time.time()
-    if now - last_tele > int(config["RUNTIME"]["TELE_INTERVAL"]) or mode == 1:
-        get_time()
-        for stack in cards.keys():
-            if cards[stack] == "megaind":
-                if tele_megaind(stack):
-                    break
-            elif cards[stack] == "megabas":
-                if tele_megabas(stack):
-                    break
-        mqtt_publish(
-            "tele/STATE",
-            json.dumps(tele),
-            int(config["MQTT"]["QOS"]),
-        )
-        last_tele = now
-        return True
-    else:
-        return False
+    mqtt_publish("tele/LWT", payload="Online", retain=True)
 
 
 def cards_watchdog(mode: int) -> bool:
@@ -1042,8 +966,7 @@ def check_heartbeat(mode: int) -> None:
         last_heartbeat = now
         mqtt_publish(
             config["HEARTBEAT"]["TOPIC_RESPONSE"],
-            str(now),
-            int(config["MQTT"]["QOS"]),
+            payload=str(now),
         )
     elif mode == 0:
         if (
@@ -1109,8 +1032,10 @@ def mqtt_init() -> None:
     client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION2)
     # Register LWT message
     client.will_set(
-        config["MQTT"]["TOPIC"] + "/tele/LWT", payload="Offline", qos=0, retain=True
+        config["MQTT"]["TOPIC"] + "/tele/LWT", payload="Offline", qos=config["MQTT"]["QOS"], retain=True
     )
+    # Let auto-reconnect progressively if the link drops.
+    client.reconnect_delay_set(min_delay=1, max_delay=30)
     # Register connect callback
     client.on_connect = mqtt_on_connect
     # Register disconnect callback
@@ -1127,21 +1052,53 @@ def mqtt_init() -> None:
         int(config["MQTT"]["PORT"]),
         int(config["MQTT"]["TIMEOUT"]),
     )
-
-    timeout = 0
-    reconnect = 0
     time.sleep(1)
+    mqtt_check()
+
+
+def mqtt_check() -> None:
+    global client
+
+    if not client:
+        raise MqttError("MQTT client is not initialized")
+
+    retries = 0
     while not client.is_connected():
-        time.sleep(1)
-        timeout += 1
-        if timeout > 15:
-            logger.info("MQTT waiting to connect")
-            if reconnect > 10:
-                logger.error("MQTT not connected!")
-                raise MqttError("MQTT not connected!")
+        if retries >= 5:
+            raise MqttError("MQTT reconnect failed")
+        logger.warning("MQTT is disconnected, trying to connect")
+        try:
             client.reconnect()
-            reconnect += 1
-            timeout = 0
+        except Exception as error:
+            logger.warning(f"MQTT reconnect attempt failed: {error}")
+        retries += 1
+        time.sleep(1)
+
+
+def mqtt_publish(
+    topic: str,
+    payload: str,
+    qos: int = int(config["MQTT"]["QOS"]),
+    retain: bool = False,
+) -> None:
+    global client
+
+    if client and client.is_connected():
+        try:
+            result = client.publish(
+                config["MQTT"]["TOPIC"] + "/" + topic,
+                payload=payload,
+                qos=qos,
+                retain=retain,
+            )
+            if result.rc != mqtt.MQTT_ERR_SUCCESS:
+                raise MqttError(f"MQTT publish failed with code {result.rc} on topic {topic}")
+        except Exception as error:
+            logger.error(f"Failed to publish MQTT message: {error}")
+            raise MqttError(f"Failed to publish MQTT message: {error}")
+    else:
+        logger.error("MQTT not connected!")
+        raise MqttError("MQTT not connected!")
 
 
 def mqtt_cleanup() -> None:
@@ -1150,14 +1107,10 @@ def mqtt_cleanup() -> None:
     if client:
         client.loop_stop()
         if client.is_connected():
+            # Unsubscribe from all topics
             cards_unsubscribe()
             # Sent LWT update
-            mqtt_publish(
-                "tele/LWT",
-                payload="Offline",
-                qos=0,
-                retain=True,
-            )
+            mqtt_publish("/tele/LWT", payload="Offline", retain=True)
             client.disconnect()
         client = None
 
@@ -1174,6 +1127,9 @@ def mqtt_on_connect(
     else:
         logger.info("MQTT client connected")
         client.connected_flag = 1
+
+    # Subscribe for MQTT topics
+    cards_subscribe()
 
 
 def mqtt_on_disconnect(
@@ -1231,14 +1187,14 @@ def mqtt_on_message(client: mqtt.Client, userdata: Any, msg: mqtt.MQTTMessage) -
     if tele:
         topic = tele.group(1)
         if topic == "state" and payload == "":
-            cards_update(1)
+            cards_tele(1)
     elif heartbeat:
         check_heartbeat(1)
     elif birth:
         if config["MQTT"]["BIRTH_TOPIC"]:
             if payload.lower() == "online":
                 logger.info("Home Assistant is online")
-                cards_update(1)
+                cards_tele(1)
             else:
                 logger.info("Home Assistant is " + payload)
     else:
@@ -1341,24 +1297,6 @@ def mqtt_on_message(client: mqtt.Client, userdata: Any, msg: mqtt.MQTTMessage) -
             )
 
 
-def mqtt_publish(topic: str, payload: str, qos: int = 0, retain: bool = False) -> None:
-
-    if client and client.is_connected():
-        try:
-            client.publish(
-                config["MQTT"]["TOPIC"] + "/" + topic,
-                payload=payload,
-                qos=qos,
-                retain=retain,
-            )
-        except Exception as error:
-            logger.error(f"Failed to publish MQTT message: {error}")
-            raise MqttError(f"Failed to publish MQTT message: {error}")
-    else:
-        logger.error("MQTT not connected!")
-        raise MqttError("MQTT not connected!")
-
-
 # Main loop
 last_heartbeat = int(time.time())
 last_watchdog = 0
@@ -1379,11 +1317,9 @@ while True:
         if not client:
             # Init mqtt
             mqtt_init()
-        # init cards inputs and subscribe for output topics
-        cards_init()
         # Run sending thread
         while True:
-            cards_update(0)
+            cards_tele(0)
             check_heartbeat(0)
             cards_watchdog(0)
             time.sleep(1)
