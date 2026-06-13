@@ -1032,7 +1032,7 @@ def mqtt_init() -> None:
     client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION2)
     # Register LWT message
     client.will_set(
-        config["MQTT"]["TOPIC"] + "/tele/LWT", payload="Offline", qos=config["MQTT"]["QOS"], retain=True
+        config["MQTT"]["TOPIC"] + "/tele/LWT", payload="Offline", qos=int(config["MQTT"]["QOS"]), retain=True
     )
     # Let auto-reconnect progressively if the link drops.
     client.reconnect_delay_set(min_delay=1, max_delay=30)
