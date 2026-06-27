@@ -1044,14 +1044,18 @@ def mqtt_init() -> None:
     client.on_message = mqtt_on_message
     # Set access token
     client.username_pw_set(config["MQTT"]["USER"], config["MQTT"]["PASS"])
+    # Connect to broker
+    try:
+        client.connect(
+            config["MQTT"]["SERVER"],
+            int(config["MQTT"]["PORT"]),
+            int(config["MQTT"]["TIMEOUT"]),
+        )
+    except Exception as error:
+        # Ensure the network loop is not left running when initial connect fails.
+        raise MqttError(f"MQTT connect failed: {error}")
     # Run receive thread
     client.loop_start()
-    # Connect to broker
-    client.connect(
-        config["MQTT"]["SERVER"],
-        int(config["MQTT"]["PORT"]),
-        int(config["MQTT"]["TIMEOUT"]),
-    )
     time.sleep(1)
     mqtt_check()
 
